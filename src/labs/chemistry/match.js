@@ -8,6 +8,12 @@ export const MAX_ATOMS = 16;
 // Simple, well-known substances offered as a starting point when the flask is empty
 export const EASY = ['H2O', 'CO2', 'NH3', 'CH4', 'NaCl', 'O2', 'HCl', 'C2H5OH'];
 
+// Substances for the «Задание» mode: school-level, up to 7 atoms
+export const TASKS = [
+    'H2O', 'CO2', 'NH3', 'CH4', 'HCl', 'O2', 'N2', 'NaCl', 'H2S', 'SO2', 'CO', 'MgO', 'NaOH',
+    'C2H4', 'C2H2', 'HNO3', 'H2SO4', 'CaCl2', 'O3', 'SO3', 'H2O2', 'KCl', 'CaO', 'HF',
+];
+
 export const compKey = comp => Object.keys(comp).sort().map(k => `${k}${comp[k]}`).join(' ');
 export const BY_KEY = new Map(MOLECULES.map(m => [compKey(m.comp), m]));
 export const BY_ID = new Map(MOLECULES.map(m => [m.id, m]));

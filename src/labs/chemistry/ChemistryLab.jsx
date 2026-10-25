@@ -5,7 +5,8 @@ import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
 import { CATEGORIES, ELEMENTS } from './elements';
 import {
-    MAX_ATOMS, atomTotal, compText, countAtoms, findExact, formatNumber, formulaParts, hillFormula, molarMass, suggestions,
+    BY_ID, MAX_ATOMS, TASKS, atomTotal, compText, countAtoms, findExact, formatNumber, formulaParts, hillFormula, missingFor, molarMass,
+    suggestions,
 } from './match';
 import ChemScene from './ChemScene';
 import './chemistry.css';
@@ -129,6 +130,33 @@ function HintCard({ items, empty, onAdd, onClose }) {
     );
 }
 
+// «Задание» mode: the teacher gets a substance by name; «Подсказка» reveals the formula and the missing atoms
+function TaskCard({ task, solved, comp, onAdd, onNext, onEnd }) {
+    const need = task.revealed ? missingFor(task.mol.comp, comp) : null;
+    return (
+        <div className="panel chem-card chem-task">
+            <div className="chem-card-top">
+                <div className="panel-title">🎯 Задание</div>
+                <span className="chip">Решено: {solved}</span>
+            </div>
+            <div className="chem-task-name">Соберите: <b>{task.mol.name.toLowerCase()}</b></div>
+            {task.revealed && (
+                <div className="chem-task-hint">
+                    <span className="chem-task-formula"><Formula text={task.mol.formula} /></span>
+                    <span className="muted">
+                        {need === null ? 'в колбе есть лишние атомы' : atomTotal(need) ? `не хватает: ${compText(need)}` : 'все атомы на месте!'}
+                    </span>
+                    {need && atomTotal(need) > 0 && <button className="btn btn-small" onClick={() => onAdd(need)}>Добавить</button>}
+                </div>
+            )}
+            <div className="chem-task-actions">
+                <button className="btn btn-small" onClick={onNext}>Другое задание</button>
+                <button className="btn btn-small btn-ghost" onClick={onEnd}>Завершить</button>
+            </div>
+        </div>
+    );
+}
+
 function MoleculeCard({ mol, onClose }) {
     const mass = molarMass(mol.comp);
     const ionic = mol.bond === 'ионная';
@@ -172,6 +200,9 @@ export default function ChemistryLab({ onBack }) {
     const [labels, setLabels] = useState(true);
     const [hints, setHints] = useState(false);
     const [message, setMessage] = useState('');
+    const [task, setTask] = useState(null); // { mol, revealed, done }
+    const [solved, setSolved] = useState(0);
+    const [toast, setToast] = useState(null); // { text, ok }
     const idRef = useRef(1);
     const zoom = useRef(1);
     const { present } = useHandStatus();
@@ -232,6 +263,36 @@ export default function ChemistryLab({ onBack }) {
         setFormKey(k => k + 1);
         setHints(false);
         setMessage('');
+        if (task && !task.done) {
+            if (exact === task.mol) {
+                setSolved(n => n + 1);
+                setTask(t => ({ ...t, done: true }));
+                setToast({ ok: true, text: `🎉 Верно! ${exact.name} — `, formula: exact.formula });
+            } else {
+                setToast({ ok: false, text: `Получилось другое вещество: ${exact.name.toLowerCase()}. А нужно: ${task.mol.name.toLowerCase()}` });
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (!toast) return undefined;
+        const t = setTimeout(() => setToast(null), 4500);
+        return () => clearTimeout(t);
+    }, [toast]);
+
+    const nextTask = () => {
+        const pool = TASKS.filter(id => id !== task?.mol.id);
+        setTask({ mol: BY_ID.get(pool[Math.floor(Math.random() * pool.length)]), revealed: false, done: false });
+        setAtoms([]);
+        setMol(null);
+        setHints(false);
+        setMessage('');
+        setToast(null);
+    };
+
+    const toggleHint = () => {
+        if (task) setTask(t => ({ ...t, revealed: !t.revealed }));
+        else setHints(v => !v);
     };
 
     const zoomBy = k => {
@@ -243,6 +304,7 @@ export default function ChemistryLab({ onBack }) {
 
     const viewControls = (
         <div className="chem-view">
+            <button className={`btn${task ? ' active' : ''}`} onClick={nextTask}>🎯 Задание</button>
             <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>Подписи</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(1.18)} aria-label="Отдалить">−</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(0.85)} aria-label="Приблизить">+</button>
@@ -265,24 +327,38 @@ export default function ChemistryLab({ onBack }) {
                     ? <MoleculeCard mol={mol} onClose={() => setMol(null)} />
                     : (
                         <>
+                            {task && (
+                                <TaskCard task={task} solved={solved} comp={comp} onAdd={addMissing} onNext={nextTask}
+                                    onEnd={() => setTask(null)} />
+                            )}
                             <FlaskCard atoms={atoms} exact={exact} message={message} />
-                            {hints && <HintCard items={hintItems} empty={total === 0} onAdd={addMissing} onClose={() => setHints(false)} />}
+                            {hints && !task && <HintCard items={hintItems} empty={total === 0} onAdd={addMissing} onClose={() => setHints(false)} />}
                         </>
                     )}
             </aside>
+
+            {toast && (
+                <div className={`lab-toast chem-toast${toast.ok ? ' ok' : ''}`} role="status">
+                    {toast.text}{toast.formula && <Formula text={toast.formula} />}
+                </div>
+            )}
 
             <nav className="lab-bottom chem-bar" aria-label="Действия">
                 {formed ? (
                     <>
                         <button className="btn" onClick={() => setMol(null)}>Разобрать на атомы</button>
-                        <button className="btn btn-primary chem-main" onClick={clear}>Новая колба</button>
+                        {task
+                            ? <button className="btn btn-primary chem-main" onClick={task.done ? nextTask : () => setMol(null)}>
+                                {task.done ? '🎯 Следующее задание' : 'Попробовать ещё'}
+                            </button>
+                            : <button className="btn btn-primary chem-main" onClick={clear}>Новая колба</button>}
                     </>
                 ) : (
                     <>
                         <button className="btn" onClick={undo} disabled={atoms.length === 0}>Убрать последний</button>
                         <button className="btn" onClick={clear} disabled={atoms.length === 0}>Очистить</button>
                         <button className="btn btn-primary chem-main" onClick={connect} disabled={atoms.length === 0}>Соединить</button>
-                        <button className={`btn${hints ? ' active' : ''}`} aria-pressed={hints} onClick={() => setHints(v => !v)}>Подсказка</button>
+                        <button className={`btn${(task ? task.revealed : hints) ? ' active' : ''}`} aria-pressed={task ? task.revealed : hints} onClick={toggleHint}>Подсказка</button>
                     </>
                 )}
             </nav>

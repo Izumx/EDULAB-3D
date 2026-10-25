@@ -3,7 +3,7 @@
 // Run: node scripts/check-chemistry.mjs
 import { MOLECULES } from '../src/labs/chemistry/molecules.js';
 import { ELEMENTS } from '../src/labs/chemistry/elements.js';
-import { MAX_ATOMS, atomTotal, countAtoms, findExact, hillFormula, molarMass, suggestions } from '../src/labs/chemistry/match.js';
+import { MAX_ATOMS, TASKS, atomTotal, countAtoms, findExact, hillFormula, molarMass, suggestions } from '../src/labs/chemistry/match.js';
 
 let problems = 0;
 const fail = msg => {
@@ -34,7 +34,9 @@ for (const m of MOLECULES) {
     if (!m.facts?.length || !m.shape || !m.bond || !m.cls) fail(`${m.id}: missing text fields`);
 }
 
-console.log(`${MOLECULES.length} recipes checked.`);
+for (const id of TASKS) if (!MOLECULES.some(m => m.id === id)) fail(`task ${id} is not in the catalog`);
+
+console.log(`${MOLECULES.length} recipes and ${TASKS.length} tasks checked.`);
 console.log('Examples:', ['H2O', 'CO2', 'SO3', 'O3'].map(id => {
     const m = MOLECULES.find(x => x.id === id);
     return `${id} = ${hillFormula(m.comp)} (${molarMass(m.comp)} г/моль)`;

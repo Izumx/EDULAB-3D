@@ -201,6 +201,23 @@ const rng = seed => {
 
 const BURST_N = 160;
 
+// Round soft spark (points without a texture are drawn as squares)
+let sparkTexture = null;
+function getSparkTexture() {
+    if (sparkTexture) return sparkTexture;
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.35, 'rgba(255,255,255,0.75)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+    sparkTexture = new THREE.CanvasTexture(c);
+    return sparkTexture;
+}
+
 // Sparks flying out of the molecule at the moment the atoms click together
 function Burst({ formKey, colors }) {
     const points = useRef(null);
@@ -255,7 +272,7 @@ function Burst({ formKey, colors }) {
                     <bufferAttribute attach="attributes-position" args={[data.pos, 3]} />
                     <bufferAttribute attach="attributes-color" args={[data.col, 3]} />
                 </bufferGeometry>
-                <pointsMaterial size={0.16} vertexColors transparent depthWrite={false} blending={THREE.AdditiveBlending} sizeAttenuation />
+                <pointsMaterial size={0.28} map={getSparkTexture()} vertexColors transparent depthWrite={false} blending={THREE.AdditiveBlending} sizeAttenuation />
             </points>
             <mesh ref={ring} visible={false} rotation={[Math.PI / 2, 0, 0]}>
                 <ringGeometry args={[0.92, 1, 64]} />
