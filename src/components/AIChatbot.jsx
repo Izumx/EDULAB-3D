@@ -1,85 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './AIChatbot.css';
 
-const MOCK_KNOWLEDGE = {
-    default: [
-        "I can help you with Chemistry, Biology, Physics, or Astronomy!",
-        "Ask me about atoms, cells, gravity, or planets.",
-        "Try asking: 'What is an atom?' or 'How does gravity work?'"
-    ],
-    chemistry: [
-        "In Chemistry, you can build molecules!",
-        "Tip: H + H + O makes Water (H2O).",
-        "Atoms are the building blocks of matter.",
-        "Try mixing Na + Cl to make Salt!"
-    ],
-    biology: [
-        "The Mitochondria is the powerhouse of the cell!",
-        "Nucleus holds the DNA instructions.",
-        "Cells are the basic units of life.",
-        "Try exploring the detailed cell model."
-    ],
-    physics: [
-        "Gravity pulls objects towards each other.",
-        "Try using the slider to change gravity!",
-        "Newton's laws explain how things move.",
-        "In this lab, you can grab and throw objects!"
-    ],
-    cosmos: [
-        "The Sun contains 99.8% of the solar system's mass.",
-        "Jupiter is the largest planet.",
-        "Try pinching carefully to zoom in on planets!",
-        "Earth is the only known planet with life."
-    ]
-};
-
-const KEYWORDS = {
-    "atom": "Atoms consist of protons, neutrons, and electrons.",
-    "molecule": "Molecules are groups of atoms bonded together.",
-    "cell": "Cells are the smallest unit of life. They have organelles like the nucleus.",
-    "gravity": "Gravity is a force of attraction. On Earth, it's 9.8 m/s².",
-    "planet": "Planes orbit stars. We have 8 in our solar system.",
-    "star": "Stars are giant balls of hot plasma, like our Sun.",
-    "water": "Water is H2O. Two hydrogen atoms and one oxygen.",
-    "dna": "DNA carries genetic instructions for development and functioning."
-};
-
 // Requests go through the Vite dev-server proxy (vite.config.js), which adds the xkiro key server-side
 const AI_ENDPOINT = '/api/ai/chat/completions';
 const AI_MODEL = 'qwen/qwen3.7-flash:free';
 const HISTORY_LIMIT = 10;
 
+const MODE_NAMES = {
+    menu: 'Главное меню',
+    chemistry: 'Химия',
+    biology: 'Биология',
+    physics: 'Физика',
+    cosmos: 'Космос',
+    quiz: 'Викторина',
+};
+
+// One-tap questions, so the teacher can ask from the board without a keyboard
+const QUICK_QUESTIONS = {
+    menu: ['Что умеет EduLab 3D?', 'Как управлять руками?', 'Придумай интересный вопрос для класса'],
+    chemistry: ['Что такое ковалентная связь?', 'Почему вода — полярная молекула?', 'Чем ионная связь отличается от ковалентной?'],
+    biology: ['Зачем клетке митохондрии?', 'Чем растительная клетка отличается от животной?', 'Как устроена ДНК?'],
+    physics: ['Почему перо падает медленнее шара?', 'Что такое ускорение свободного падения?', 'Почему на Луне всё легче?'],
+    cosmos: ['Почему у Венеры такая жара?', 'Сколько лететь до Марса?', 'Почему Плутон больше не планета?'],
+    quiz: ['Объясни последний ответ подробнее', 'Дай подсказку, не называя ответ', 'Придумай похожий вопрос'],
+};
+
+const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+
+// Minimal safe formatting for model replies: **bold** and line breaks, nothing else is interpreted
+function renderText(text) {
+    return text.split('\n').filter(Boolean).map((line, i) => (
+        <p key={i}>
+            {line.split(/(\*\*[^*]+\*\*)/g).map((part, j) => part.startsWith('**') && part.endsWith('**')
+                ? <strong key={j}>{part.slice(2, -2)}</strong>
+                : part.replace(/^#+\s*/, '').replace(/^[-*]\s+/, '• '))}
+        </p>
+    ));
+}
+
+function speak(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.replace(/\*\*/g, ''));
+    utterance.lang = 'ru-RU';
+    const voice = window.speechSynthesis.getVoices().find(v => v.lang.startsWith('ru'));
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+}
+
 export const AIChatbot = ({ mode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { text: "Hi! I'm your AI Lab Assistant. How can I help?", sender: 'bot' }
+        { text: 'Привет! Я EduBot — помощник на уроке. Нажмите на готовый вопрос, скажите его голосом 🎤 или напишите.', sender: 'bot' }
     ]);
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [listening, setListening] = useState(false);
+    const [readAloud, setReadAloud] = useState(false);
 
     const messagesEndRef = useRef(null);
+    const recognitionRef = useRef(null);
 
-    // Auto-scroll to bottom
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, isLoading]);
 
-    // Context-aware greeting on mode switch
-    useEffect(() => {
-        if (mode && mode !== 'menu') {
-            const contextMsg = `Welcome to the ${mode.charAt(0).toUpperCase() + mode.slice(1)} Lab!`;
-            setMessages(prev => [...prev, { text: contextMsg, sender: 'bot' }]);
-        }
-    }, [mode]);
+    useEffect(() => () => {
+        recognitionRef.current?.abort();
+        window.speechSynthesis?.cancel();
+    }, []);
 
-    const handleSend = async (e) => {
-        e.preventDefault();
-        if (!input.trim()) return;
-
-        const userMsg = input.trim();
+    const ask = async (question) => {
+        const userMsg = question.trim();
+        if (!userMsg || isLoading) return;
         const history = [...messages, { text: userMsg, sender: 'user' }];
         setMessages(history);
-        setInput("");
+        setInput('');
         setIsLoading(true);
 
         try {
@@ -91,10 +87,9 @@ export const AIChatbot = ({ mode }) => {
                     messages: [
                         {
                             role: 'system',
-                            content: `You are EduBot, an intelligent and helpful AI assistant in a 3D Science Education App called EduLab 3D.
-The user is currently in the "${mode}" module.
-If asked about the app, explain that it allows exploring Chemistry (molecules), Biology (cells), Physics (gravity), and Cosmos (planets).
-Keep answers concise, educational, and friendly. Answer in the same language the user writes in.`
+                            content: `You are EduBot, a friendly science teaching assistant inside EduLab 3D, a 3D science app used in school lessons on a projector.
+The teacher is currently in the "${MODE_NAMES[mode] || mode}" section. The app has labs: Chemistry (build molecules), Biology (cell organelles, DNA), Physics (gravity, free fall, air resistance), Cosmos (Solar System), and a class Quiz. Users control it with hand gestures through the webcam.
+Answer for school students (grades 7–10): accurate, short (2–5 sentences), clear, with a simple example when helpful. Answer in the same language the user writes in (usually Russian).`
                         },
                         ...history.slice(-HISTORY_LIMIT).map(m => ({
                             role: m.sender === 'user' ? 'user' : 'assistant',
@@ -105,74 +100,107 @@ Keep answers concise, educational, and friendly. Answer in the same language the
             });
 
             const data = await response.json();
-
             if (!response.ok || data.error) {
                 throw new Error(data.error?.message || `HTTP ${response.status}`);
             }
 
-            const aiText = data.choices?.[0]?.message?.content || "I couldn't generate a response.";
+            const aiText = data.choices?.[0]?.message?.content?.trim() || 'Не получилось сформулировать ответ. Попробуйте спросить иначе.';
             setMessages(prev => [...prev, { text: aiText, sender: 'bot' }]);
-
+            if (readAloud) speak(aiText);
         } catch (error) {
-            console.error("AI Error:", error);
-            setMessages(prev => [...prev, { text: "Error connecting to AI. Is the dev server running with XKIRO_API_KEY in .env?", sender: 'bot' }]);
+            console.error('AI Error:', error);
+            setMessages(prev => [...prev, { text: 'Нет связи с ИИ. Проверьте интернет и попробуйте ещё раз.', sender: 'bot', error: true }]);
         } finally {
             setIsLoading(false);
         }
     };
 
+    const toggleListening = () => {
+        if (listening) {
+            recognitionRef.current?.stop();
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'ru-RU';
+        recognition.interimResults = true;
+        let finalText = '';
+        recognition.onresult = (e) => {
+            finalText = Array.from(e.results).map(r => r[0].transcript).join('');
+            setInput(finalText);
+        };
+        recognition.onerror = (e) => {
+            if (e.error === 'not-allowed') {
+                setMessages(prev => [...prev, { text: 'Нет доступа к микрофону. Разрешите его в адресной строке браузера.', sender: 'bot', error: true }]);
+            }
+        };
+        recognition.onend = () => {
+            setListening(false);
+            if (finalText) ask(finalText);
+        };
+        recognitionRef.current = recognition;
+        setListening(true);
+        recognition.start();
+    };
+
+    const quick = QUICK_QUESTIONS[mode] || QUICK_QUESTIONS.menu;
+
     return (
-        <div className={`ai-chatbot ${isOpen ? 'open' : 'closed'}`}>
-            {/* Floating Action Button */}
+        <div className={`ai-chatbot ${isOpen ? 'open' : ''}`}>
             {!isOpen && (
-                <button className="ai-fab" onClick={() => setIsOpen(true)}>
-                    🤖
-                    <span className="ai-tooltip">Ask AI!</span>
+                <button className="ai-fab" onClick={() => setIsOpen(true)} aria-label="Открыть EduBot">
+                    <span className="ai-fab-icon">🤖</span>
+                    <span className="ai-fab-text">Спросить</span>
                 </button>
             )}
 
-            {/* Chat Window */}
             {isOpen && (
-                <div className="ai-window">
+                <div className="ai-window panel">
                     <header className="ai-header">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div className="ai-avatar">🤖</div>
-                            <div>
-                                <h3>EduBot</h3>
-                                <span>Online</span>
-                            </div>
+                        <div className="ai-avatar">🤖</div>
+                        <div className="ai-header-text">
+                            <h3>EduBot</h3>
+                            <span>Раздел: {MODE_NAMES[mode] || mode}</span>
                         </div>
-                        <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+                        <button className={`btn btn-icon btn-small ${readAloud ? 'active' : ''}`}
+                            onClick={() => { setReadAloud(r => !r); window.speechSynthesis?.cancel(); }}
+                            title="Читать ответы вслух" aria-label="Читать ответы вслух">🔊</button>
+                        <button className="btn btn-icon btn-small" onClick={() => setIsOpen(false)} aria-label="Закрыть">✕</button>
                     </header>
 
-                    <>
-                            <div className="ai-messages">
-                                {messages.map((msg, i) => (
-                                    <div key={i} className={`message ${msg.sender}`}>
-                                        <div className="bubble">
-                                            {msg.text}
-                                        </div>
-                                    </div>
-                                ))}
-                                {isLoading && (
-                                    <div className="message bot">
-                                        <div className="bubble thinking">...</div>
-                                    </div>
-                                )}
-                                <div ref={messagesEndRef} />
+                    <div className="ai-messages">
+                        {messages.map((msg, i) => (
+                            <div key={i} className={`message ${msg.sender} ${msg.error ? 'error' : ''}`}>
+                                <div className="bubble">{msg.sender === 'bot' ? renderText(msg.text) : msg.text}</div>
                             </div>
+                        ))}
+                        {isLoading && (
+                            <div className="message bot">
+                                <div className="bubble thinking"><span /><span /><span /></div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
 
-                            <form className="ai-input-area" onSubmit={handleSend}>
-                                <input
-                                    type="text"
-                                    placeholder="Ask anything..."
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    disabled={isLoading}
-                                />
-                                <button type="submit" disabled={isLoading}>{isLoading ? '...' : 'Send'}</button>
-                            </form>
-                    </>
+                    <div className="ai-quick">
+                        {quick.map(q => (
+                            <button key={q} className="ai-chip" onClick={() => ask(q)} disabled={isLoading}>{q}</button>
+                        ))}
+                    </div>
+
+                    <form className="ai-input-area" onSubmit={(e) => { e.preventDefault(); ask(input); }}>
+                        {SpeechRecognition && (
+                            <button type="button" className={`btn btn-icon ${listening ? 'listening' : ''}`} onClick={toggleListening}
+                                aria-label={listening ? 'Остановить запись' : 'Спросить голосом'} title="Спросить голосом">🎤</button>
+                        )}
+                        <input
+                            type="text"
+                            placeholder={listening ? 'Говорите…' : 'Ваш вопрос…'}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            disabled={isLoading}
+                        />
+                        <button type="submit" className="btn btn-primary" disabled={isLoading || !input.trim()}>➤</button>
+                    </form>
                 </div>
             )}
         </div>

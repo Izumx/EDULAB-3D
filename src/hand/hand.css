@@ -1,0 +1,165 @@
+.hand-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.hand-cursor.hidden {
+    opacity: 0;
+}
+
+.hand-cursor svg {
+    position: absolute;
+    left: -36px;
+    top: -36px;
+    transform: rotate(-90deg);
+    transition: transform 0.15s;
+}
+
+.hand-cursor-track {
+    fill: rgba(10, 14, 28, 0.25);
+    stroke: rgba(255, 255, 255, 0.85);
+    stroke-width: 4;
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.8));
+}
+
+.hand-cursor-progress {
+    fill: none;
+    stroke: var(--accent, #22d3ee);
+    stroke-width: 7;
+    stroke-linecap: round;
+}
+
+.hand-cursor-dot {
+    position: absolute;
+    left: -8px;
+    top: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent, #22d3ee);
+    transition: transform 0.15s, background 0.15s;
+}
+
+.hand-cursor.over-target svg {
+    transform: rotate(-90deg) scale(1.15);
+}
+
+.hand-cursor.grabbing .hand-cursor-dot {
+    background: #fbbf24;
+    transform: scale(1.8);
+}
+
+.hand-cursor.grabbing .hand-cursor-track {
+    stroke: #fbbf24;
+}
+
+.hand-cursor.pulse svg {
+    animation: hand-pulse 0.3s ease-out;
+}
+
+@keyframes hand-pulse {
+    from { transform: rotate(-90deg) scale(1.6); opacity: 0.4; }
+    to { transform: rotate(-90deg) scale(1); opacity: 1; }
+}
+
+.hand-cursor-label {
+    position: absolute;
+    left: 44px;
+    top: -18px;
+    white-space: nowrap;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(10, 14, 28, 0.85);
+    color: #fff;
+    font: 600 1.1rem/1.4 var(--font-body, sans-serif);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hand-cursor-label:empty {
+    display: none;
+}
+
+/* Elements under the hand cursor get .hand-hover (CSS :hover doesn't fire for the virtual cursor) */
+.hand-hover {
+    outline: 3px solid var(--accent, #22d3ee) !important;
+    outline-offset: 3px;
+}
+
+.camera-preview {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 900;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 16px;
+    background: rgba(10, 14, 28, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font: 500 0.95rem/1.35 var(--font-body, sans-serif);
+}
+
+.camera-preview.error {
+    border-color: #f87171;
+}
+
+.camera-preview-video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+}
+
+.camera-preview-video video,
+.camera-preview-video canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-preview-video video {
+    transform: scaleX(-1);
+    opacity: 0.75;
+}
+
+.camera-preview-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px;
+}
+
+.camera-preview .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: none;
+}
+
+.camera-preview .dot.ok {
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+.camera-preview .dot.wait {
+    background: #fbbf24;
+    animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0.3; }
+}

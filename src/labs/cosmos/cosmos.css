@@ -1,0 +1,304 @@
+/* Cosmos lab */
+.lab:has(.cosmos-bar) {
+    background: #02040a;
+}
+
+/* ---------- header scale toggle ---------- */
+.cosmos-seg {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.3rem;
+    border-radius: calc(var(--radius-sm) + 0.3rem);
+    background: rgba(7, 11, 22, 0.7);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+.cosmos-seg .btn {
+    min-height: 2.8rem;
+    background: transparent;
+    border-color: transparent;
+}
+
+.cosmos-seg .btn.active {
+    background: var(--accent);
+    color: #0b0720;
+}
+
+/* ---------- left controls ---------- */
+.cosmos-left {
+    width: min(17.5rem, 26vw);
+}
+
+.cosmos-left .panel {
+    padding: 0.9rem 1rem;
+}
+
+.cosmos-speed {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+}
+
+.cosmos-speed .btn {
+    padding: 0;
+    font-size: 1.05rem;
+}
+
+.cosmos-speed-info,
+.cosmos-date {
+    margin-top: 0.6rem;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+}
+
+.cosmos-date span:last-child {
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.cosmos-cam {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.4rem;
+}
+
+.cosmos-zoom {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.cosmos-credit {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    padding: 0 0.3rem;
+}
+
+/* ---------- right cards ---------- */
+.cosmos-right {
+    width: min(24rem, 31vw);
+    max-height: calc(100% - var(--header-h) - 9.5rem);
+}
+
+.cosmos-card {
+    padding: 1.1rem 1.2rem 1.2rem;
+    animation: cosmos-in 0.35s ease-out;
+}
+
+.cosmos-card h2 {
+    font-size: 1.5rem;
+}
+
+@keyframes cosmos-in {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: none; }
+}
+
+.cosmos-card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.7rem;
+}
+
+.cosmos-card-dot {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--body-color);
+    box-shadow: 0 0 14px var(--body-color);
+}
+
+.cosmos-card-type {
+    font-size: 0.95rem;
+    color: var(--body-color);
+    font-weight: 600;
+    filter: brightness(1.15);
+}
+
+.cosmos-card-close {
+    margin-left: auto;
+    flex: none;
+    width: 2.8rem;
+    min-height: 2.8rem;
+    font-size: 1.1rem;
+}
+
+.cosmos-row {
+    display: grid;
+    grid-template-columns: 9.2rem 1fr;
+    gap: 0.6rem;
+    padding: 0.42rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 0.95rem;
+}
+
+.cosmos-row-label {
+    color: var(--text-muted);
+}
+
+.cosmos-row-value {
+    font-weight: 600;
+}
+
+.cosmos-row-sub {
+    display: block;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.cosmos-fact {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.cosmos-card-link {
+    width: 100%;
+    margin-top: 0.8rem;
+}
+
+.cosmos-lead {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+}
+
+.cosmos-hints,
+.cosmos-scale-list {
+    margin: 0.8rem 0 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.95rem;
+}
+
+.cosmos-hints b,
+.cosmos-scale-list b {
+    color: var(--accent);
+}
+
+.cosmos-note {
+    margin-top: 0.9rem;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+}
+
+/* ---------- planet bar ---------- */
+.cosmos-bar {
+    gap: 0.25rem;
+    padding: 0.45rem 0.5rem 0.35rem;
+    border-radius: 1.4rem;
+    background: rgba(7, 11, 22, 0.62);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+}
+
+.cosmos-planet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    width: 4.5rem;
+    padding: 0.2rem 0 0.15rem;
+    border: 1px solid transparent;
+    border-radius: 1rem;
+    background: transparent;
+    color: var(--text);
+    font: 600 0.9rem/1.1 var(--font-body);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.cosmos-planet:hover,
+.cosmos-planet.hand-hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-strong);
+}
+
+.cosmos-planet.active {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    border-color: var(--accent);
+}
+
+.cosmos-planet-ball {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    background-color: var(--body-color);
+    background-size: 200% 100%;
+    background-position: 30% 50%;
+    box-shadow: inset -0.7rem -0.5rem 1.1rem rgba(0, 0, 0, 0.75), inset 0.2rem 0.2rem 0.6rem rgba(255, 255, 255, 0.18),
+        0 0 0.9rem color-mix(in srgb, var(--body-color) 45%, transparent);
+    transition: transform 0.2s;
+}
+
+.cosmos-planet:hover .cosmos-planet-ball,
+.cosmos-planet.hand-hover .cosmos-planet-ball,
+.cosmos-planet.active .cosmos-planet-ball {
+    transform: scale(1.1);
+}
+
+.cosmos-planet:first-child .cosmos-planet-ball {
+    box-shadow: 0 0 1.2rem rgba(255, 170, 60, 0.85), inset 0 0 0.6rem rgba(255, 240, 200, 0.5);
+}
+
+/* ---------- 3D labels ---------- */
+.cosmos-tag {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, calc(-100% - 0.3rem));
+    transition: opacity 0.25s;
+    pointer-events: none;
+    user-select: none;
+}
+
+.cosmos-tag-name {
+    padding: 0.15em 0.65em;
+    border-radius: 999px;
+    background: rgba(7, 11, 22, 0.72);
+    border: 1px solid color-mix(in srgb, var(--tag-color) 70%, transparent);
+    color: var(--text);
+    font: 600 0.95rem/1.3 var(--font-body);
+    white-space: nowrap;
+    text-shadow: 0 1px 3px #000;
+}
+
+.cosmos-tag-stem {
+    display: none;
+}
+
+/* real scale: the label points at a (possibly sub-pixel) planet with a stem and a dot */
+.cosmos-tag.is-real {
+    transform: translate(-50%, calc(-100% + 0.3rem));
+}
+
+.cosmos-tag.is-real .cosmos-tag-stem {
+    display: block;
+    width: 2px;
+    height: 1.1rem;
+    background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+    position: relative;
+}
+
+.cosmos-tag.is-real .cosmos-tag-stem::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -0.3rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-left: -0.3rem;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 6px #fff;
+}

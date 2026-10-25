@@ -1,218 +1,124 @@
-import React, { useState, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Stars, Float, PerspectiveCamera, Environment } from '@react-three/drei';
-import { useUser } from '../context/UserContext';
+import React, { useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars } from '@react-three/drei';
+import { useHandStatus } from '../hand/handStore';
+import { useHandSettings, setHandSettings } from '../hand/settings';
+import { startTracker } from '../hand/tracker';
 import './Dashboard.css';
 
-// Background 3D Scene
-const DashboardScene = () => {
-    return (
-        <>
-            <PerspectiveCamera makeDefault position={[0, 0, 20]} />
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} intensity={1} color="#4400ff" />
-            <pointLight position={[-10, -10, 10]} intensity={1} color="#00ffff" />
+const MODULES = [
+    { id: 'chemistry', title: 'Химия', icon: '🧪', desc: 'Собирайте молекулы из атомов', color: 'var(--chem)' },
+    { id: 'biology', title: 'Биология', icon: '🧬', desc: 'Клетка, органоиды и ДНК', color: 'var(--bio)' },
+    { id: 'physics', title: 'Физика', icon: '🍎', desc: 'Гравитация и движение тел', color: 'var(--phys)' },
+    { id: 'cosmos', title: 'Космос', icon: '🪐', desc: 'Путешествие по Солнечной системе', color: 'var(--cosmos)' },
+    { id: 'quiz', title: 'Викторина', icon: '🏆', desc: 'Проверка знаний всем классом', color: 'var(--quiz)' },
+];
 
-            <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={1} />
-            <Environment preset="city" />
+const SENSITIVITY = [['low', 'Низкая'], ['medium', 'Средняя'], ['high', 'Высокая']];
+const DWELL = [[0, 'Выкл'], [700, '0,7 с'], [1000, '1 с'], [1500, '1,5 с']];
 
-            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                {/* Abstract floating shapes for depth */}
-                <mesh position={[-15, 5, -10]} rotation={[0, 0.5, 0]}>
-                    <icosahedronGeometry args={[2, 0]} />
-                    <meshStandardMaterial color="#00ffff" wireframe opacity={0.1} transparent />
-                </mesh>
-                <mesh position={[15, -5, -15]} rotation={[0.5, 0, 0]}>
-                    <torusKnotGeometry args={[2, 0.5, 100, 16]} />
-                    <meshStandardMaterial color="#ff00ff" wireframe opacity={0.1} transparent />
-                </mesh>
-            </Float>
-        </>
-    );
-};
+function SlowStars() {
+    const ref = React.useRef();
+    useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.01; });
+    return <group ref={ref}><Stars radius={80} depth={60} count={4000} factor={4} fade speed={0.6} /></group>;
+}
 
-export const Dashboard = ({ setMode }) => {
-    const { user } = useUser();
-    const [activeTab, setActiveTab] = useState('overview'); // overview, social, profile
+function CameraControl() {
+    const settings = useHandSettings();
+    const { status, error, present } = useHandStatus();
+    const [open, setOpen] = useState(false);
 
-    const MODULES = [
-        { id: 'chemistry', title: 'Chemistry Lab', icon: '🧪', desc: 'Build 3D Molecules', color: 'var(--chem-color)' },
-        { id: 'biology', title: 'Biology Lab', icon: '🧬', desc: 'Explore Life & Cells', color: 'var(--bio-color)' },
-        { id: 'physics', title: 'Physics Lab', icon: '🍎', desc: 'Gravity & Motion', color: '#ffaa00' },
-        { id: 'cosmos', title: 'Cosmos Lab', icon: '🪐', desc: 'Solar System Tour', color: 'var(--cosmos-color)' },
-        { id: 'quiz', title: 'Knowledge Quiz', icon: '🧠', desc: 'Test Your Skills', color: 'var(--quiz-color)' }
-    ];
-
-    const BADGES = [
-        { id: 'first_login', icon: '🚀', name: 'Explorer', desc: 'Started the journey' },
-        { id: 'chem_master', icon: '⚗️', name: 'Alchemist', desc: 'Created 5 molecules' },
-        { id: 'quiz_ace', icon: '🏆', name: 'Quiz Master', desc: 'Scored 100%' }
-    ];
+    const label = !settings.cameraEnabled ? 'Управление руками выключено'
+        : status === 'loading' ? 'Запускаю камеру…'
+            : status === 'error' ? 'Ошибка камеры'
+                : present ? 'Рука найдена' : 'Покажите ладонь камере';
 
     return (
-        <div className="dashboard-container">
-            {/* 3D Background Layer */}
-            <div className="dashboard-bg">
-                <Canvas>
-                    <Suspense fallback={null}>
-                        <DashboardScene />
-                    </Suspense>
-                </Canvas>
+        <div className="camera-control">
+            <div className={`camera-state ${settings.cameraEnabled ? status : 'off'} ${present ? 'present' : ''}`}>
+                <span className="dot" />
+                {label}
             </div>
+            {settings.cameraEnabled ? (
+                <button className="btn" onClick={() => setHandSettings({ cameraEnabled: false })}>Выключить камеру</button>
+            ) : (
+                <button className="btn btn-primary" onClick={() => setHandSettings({ cameraEnabled: true })}>✋ Включить управление руками</button>
+            )}
+            <button className={`btn btn-icon ${open ? 'active' : ''}`} onClick={() => setOpen(o => !o)} title="Настройки" aria-label="Настройки">⚙️</button>
 
-            {/* Content Layer */}
-            <div className="dashboard-content">
-
-                {/* SIDEBAR */}
-                <aside className="dash-sidebar">
-                    <div className="logo-container">
-                        <div className="logo-icon">💠</div>
-                        <div className="logo-text">EduLab <span>3D</span></div>
+            {open && (
+                <div className="settings-panel panel">
+                    <div className="panel-title">Чувствительность</div>
+                    <p className="muted small">Чем выше, тем меньше нужно двигать рукой. Высокая — если стоите далеко.</p>
+                    <div className="segmented">
+                        {SENSITIVITY.map(([value, text]) => (
+                            <button key={value} className={`btn btn-small ${settings.sensitivity === value ? 'active' : ''}`}
+                                onClick={() => setHandSettings({ sensitivity: value })}>{text}</button>
+                        ))}
                     </div>
-
-                    <nav>
-                        <button className={activeTab === 'overview' ? 'active' : ''} onClick={() => setActiveTab('overview')}>
-                            <span className="icon">🏠</span> <span className="label">Overview</span>
-                        </button>
-                        <button className={activeTab === 'social' ? 'active' : ''} onClick={() => setActiveTab('social')}>
-                            <span className="icon">👥</span> <span className="label">Social</span>
-                        </button>
-                        <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
-                            <span className="icon">👤</span> <span className="label">Profile</span>
-                        </button>
-                    </nav>
-
-                    <div className="user-profile-widget">
-                        <div className="avatar-ring">
-                            <div className="avatar">👤</div>
-                        </div>
-                        <div className="user-info">
-                            <h4>{user.name}</h4>
-                            <div className="xp-bar">
-                                <div className="fill" style={{ width: `${(user.xp % 100)}%` }}></div>
-                            </div>
-                            <small>Lvl {user.level} • {user.xp} XP</small>
-                        </div>
+                    <div className="panel-title">Нажатие задержкой руки</div>
+                    <div className="segmented">
+                        {DWELL.map(([value, text]) => (
+                            <button key={value} className={`btn btn-small ${settings.dwellMs === value ? 'active' : ''}`}
+                                onClick={() => setHandSettings({ dwellMs: value })}>{text}</button>
+                        ))}
                     </div>
-                </aside>
-
-                {/* MAIN AREA */}
-                <main className="dash-main">
-                    <header className="dash-header">
-                        <div className="welcome-text">
-                            <h1>Hello, {user.name}</h1>
-                            <p>Ready to explore science today?</p>
-                        </div>
-                        <div className="streak-widget">
-                            <span className="fire">🔥</span>
-                            <div className="streak-info">
-                                <strong>{user.streak} Days</strong>
-                                <small>Streak</small>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div className="dash-scroll-area">
-                        {activeTab === 'overview' && (
-                            <div className="overview-view">
-                                <section className="modules-section">
-                                    <h2>Learning Modules</h2>
-                                    <div className="modules-grid-premium">
-                                        {MODULES.map((mod, index) => (
-                                            <div
-                                                key={mod.id}
-                                                className="module-card-premium"
-                                                style={{ '--accent-color': mod.color, animationDelay: `${index * 0.1}s` }}
-                                                onClick={() => setMode(mod.id)}
-                                            >
-                                                <div className="card-bg-glow"></div>
-                                                <div className="mod-icon-large">{mod.icon}</div>
-                                                <div className="mod-details">
-                                                    <h3>{mod.title}</h3>
-                                                    <p>{mod.desc}</p>
-                                                    <div className="mod-action">Enter Lab →</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-
-                                <section className="stats-section">
-                                    <h2>Quick Stats</h2>
-                                    <div className="stats-grid-mini">
-                                        <div className="stat-box">
-                                            <div className="label">Total XP</div>
-                                            <div className="val">{user.xp}</div>
-                                        </div>
-                                        <div className="stat-box">
-                                            <div className="label">Badges</div>
-                                            <div className="val">{user.badges.length}</div>
-                                        </div>
-                                        <div className="stat-box">
-                                            <div className="label">Rank</div>
-                                            <div className="val">#4</div>
-                                        </div>
-                                    </div>
-                                </section>
-                            </div>
-                        )}
-
-                        {activeTab === 'profile' && (
-                            <div className="profile-view">
-                                <div className="profile-header-card">
-                                    <div className="ph-avatar">👤</div>
-                                    <div className="ph-info">
-                                        <h2>{user.name}</h2>
-                                        <p>Science Enthusiast</p>
-                                        <div className="ph-badges-row">
-                                            {user.badges.map(b => <span key={b.id} title={b.name}>{b.icon}</span>)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <h3>Achievements Checklist</h3>
-                                <div className="badges-grid-premium">
-                                    {BADGES.map((badge, i) => {
-                                        const isUnlocked = user.badges.some(b => b.id === badge.id) || i === 0;
-                                        return (
-                                            <div key={badge.id} className={`badge-card-premium ${isUnlocked ? 'unlocked' : 'locked'}`}>
-                                                <div className="badge-icon-large">{badge.icon}</div>
-                                                <div className="badge-meta">
-                                                    <h4>{badge.name}</h4>
-                                                    <p>{badge.desc}</p>
-                                                </div>
-                                                {isUnlocked ? <div className="status-icon">✓</div> : <div className="status-icon">🔒</div>}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'social' && (
-                            <div className="social-view">
-                                <h3>Global Leaderboard</h3>
-                                <div className="leaderboard-premium">
-                                    {[
-                                        { rank: 1, name: 'Alice', xp: 2500, avatar: '👩‍🔬' },
-                                        { rank: 2, name: 'Bob', xp: 2100, avatar: '👨‍🚀' },
-                                        { rank: 3, name: 'Charlie', xp: 1800, avatar: '👨‍🔬' },
-                                        { rank: 4, name: `${user.name} (You)`, xp: user.xp, avatar: '👤', isMe: true },
-                                        { rank: 5, name: 'Diana', xp: 900, avatar: '👩‍🚀' }
-                                    ].map((player) => (
-                                        <div key={player.rank} className={`lb-row ${player.rank <= 3 ? 'top-rank' : ''} ${player.isMe ? 'me' : ''}`}>
-                                            <div className="lb-rank">{player.rank}</div>
-                                            <div className="lb-avatar">{player.avatar}</div>
-                                            <div className="lb-name">{player.name}</div>
-                                            <div className="lb-xp">{player.xp} XP</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                    <div className="panel-title">Окно камеры</div>
+                    <div className="segmented">
+                        <button className={`btn btn-small ${settings.showPreview ? 'active' : ''}`} onClick={() => setHandSettings({ showPreview: true })}>Показывать</button>
+                        <button className={`btn btn-small ${!settings.showPreview ? 'active' : ''}`} onClick={() => setHandSettings({ showPreview: false })}>Скрыть</button>
                     </div>
-                </main>
-            </div>
+                    {status === 'error' && (
+                        <div className="settings-error">
+                            <p>{error}</p>
+                            <button className="btn btn-small" onClick={() => startTracker()}>Повторить</button>
+                        </div>
+                    )}
+                    <p className="muted small privacy">
+                        Видео с камеры обрабатывается только на этом компьютере и никуда не отправляется.
+                        Библиотека MediaPipe (Google) может отправлять обезличенную статистику работы.
+                    </p>
+                </div>
+            )}
         </div>
     );
-};
+}
+
+export const Dashboard = ({ onOpen }) => (
+    <div className="dashboard">
+        <div className="dashboard-bg">
+            <Canvas camera={{ position: [0, 0, 1] }} dpr={[1, 1.5]}>
+                <SlowStars />
+            </Canvas>
+        </div>
+
+        <header className="dashboard-top">
+            <div className="brand">
+                <img src="/favicon.svg" alt="" width="44" height="44" />
+                <span>EduLab <b>3D</b></span>
+            </div>
+            <CameraControl />
+        </header>
+
+        <main className="dashboard-main">
+            <h1 className="dashboard-heading">Выберите лабораторию</h1>
+            <div className="module-grid">
+                {MODULES.map(m => (
+                    <button key={m.id} className="module-card" style={{ '--accent': m.color }} onClick={() => onOpen(m.id)}>
+                        <span className="module-icon" aria-hidden="true">{m.icon}</span>
+                        <span className="module-title">{m.title}</span>
+                        <span className="module-desc">{m.desc}</span>
+                    </button>
+                ))}
+                <div className="module-card help-card">
+                    <span className="module-title">Как управлять руками</span>
+                    <ul>
+                        <li><span>🖐️</span> Ведите ладонью — двигается курсор</li>
+                        <li><span>⏱️</span> Задержите курсор на кнопке — она нажмётся</li>
+                        <li><span>🤏</span> Щипок или <span>✊</span> кулак — схватить, вращать, нажать сразу</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+);

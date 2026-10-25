@@ -1,16 +1,51 @@
-# React + Vite
+# EduLab 3D
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Интерактивные 3D-лаборатории для уроков естественных наук. Учитель стоит у доски и управляет приложением **жестами руки через веб-камеру ноутбука**, а класс видит всё на проекторе.
 
-Currently, two official plugins are available:
+| Лаборатория | Что можно делать |
+|---|---|
+| 🧪 Химия | Собирать молекулы из атомов, смотреть строение, тип связи и геометрию |
+| 🧬 Биология | Изучать органоиды животной и растительной клетки, строение ДНК |
+| 🍎 Физика | Бросать предметы, менять гравитацию (Земля, Луна, Марс…), опыт Галилея |
+| 🪐 Космос | Летать к планетам Солнечной системы, сравнивать их характеристики |
+| 🏆 Викторина | Квиз для всего класса, режим команд |
+| 🤖 EduBot | ИИ-помощник: готовые вопросы, голосовой ввод, чтение ответов вслух |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Управление руками
 
-## React Compiler
+- 🖐️ **Ведите ладонью** — двигается курсор.
+- ⏱️ **Задержите курсор на кнопке** (~1 с) — она нажмётся.
+- 🤏 **Щипок** или ✊ **кулак** — схватить объект, вращать модель, мгновенно нажать кнопку.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Распознавание работает прямо в браузере (MediaPipe Gesture Recognizer). Видео с камеры никуда не отправляется. Модель и все файлы лежат в проекте, поэтому приложение работает **без интернета** (кроме EduBot). В настройках (⚙️ в главном меню) можно изменить чувствительность (если стоите далеко — «Высокая») и время нажатия задержкой.
 
-## Expanding the ESLint configuration
+## Запуск
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Нужен Node.js 20+.
+
+```bash
+npm install
+cp .env.example .env   # и впишите XKIRO_API_KEY для EduBot
+npm run dev
+```
+
+Откройте http://localhost:5173. Камера в браузере работает только на `localhost` или по `https`.
+
+## Публикация (Vercel)
+
+Фронтенд собирается командой `npm run build`. EduBot в продакшене работает через серверную функцию [`api/ai/chat/completions.js`](api/ai/chat/completions.js) — добавьте `XKIRO_API_KEY` в переменные окружения проекта Vercel. Ключ никогда не попадает в браузер.
+
+## Устройство проекта
+
+```
+src/
+  hand/        движок жестов: трекер, сглаживание (One Euro), курсор, нажатие задержкой, 3D-наведение
+  ui/          общая оболочка лабораторий, 3D-свет и подписи
+  labs/        лаборатории: chemistry, biology, physics, cosmos, quiz
+  components/  меню, EduBot, обработка ошибок
+  styles/      дизайн-система (цвета, кнопки, панели)
+api/           серверная функция для ИИ (Vercel)
+public/models  модель распознавания жестов MediaPipe
+```
+
+Текстуры планет: [Solar System Scope](https://www.solarsystemscope.com/textures/), CC BY 4.0.

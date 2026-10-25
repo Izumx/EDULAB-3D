@@ -1,0 +1,398 @@
+/* Physics lab */
+
+.phys-stage {
+    position: absolute;
+    inset: 0;
+}
+
+.phys-stage canvas {
+    touch-action: none;
+}
+
+.lab-left.phys-side,
+.lab-right.phys-side {
+    width: min(19rem, 27vw);
+}
+
+.phys-side .panel {
+    flex-shrink: 0;
+}
+
+/* --- gravity presets --- */
+.phys-presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.btn.phys-preset {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.55rem;
+    justify-items: start;
+    align-items: center;
+    min-height: 3.6rem;
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+}
+
+.btn.phys-preset:last-child {
+    grid-column: span 2;
+}
+
+.phys-preset-icon {
+    grid-row: span 2;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.phys-preset-name {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.phys-preset-g {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.btn.phys-preset.active .phys-preset-g {
+    color: inherit;
+    opacity: 0.8;
+}
+
+.btn.phys-preset.active {
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* --- g slider --- */
+.phys-g-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-top: 0.9rem;
+}
+
+.phys-g-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.phys-g-value {
+    font: 600 1.55rem/1.2 var(--font-display);
+    color: var(--accent);
+}
+
+.phys-g-value small {
+    font: 500 1rem var(--font-body);
+    color: var(--text-muted);
+}
+
+.phys-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2.4rem;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.phys-range::-webkit-slider-runnable-track {
+    height: 0.7rem;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--accent) var(--fill), rgba(255, 255, 255, 0.16) var(--fill));
+}
+
+.phys-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin-top: -0.6rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--accent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent);
+    transition: transform 0.15s;
+}
+
+.phys-range::-moz-range-track {
+    height: 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.phys-range::-moz-range-progress {
+    height: 0.7rem;
+    border-radius: 999px;
+    background: var(--accent);
+}
+
+.phys-range::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--accent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.phys-range:hover::-webkit-slider-thumb,
+.phys-range.hand-hover::-webkit-slider-thumb {
+    transform: scale(1.15);
+}
+
+.phys-range:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+/* --- air toggle --- */
+.btn.phys-toggle {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 0.7rem;
+}
+
+.phys-switch {
+    position: relative;
+    width: 3.2rem;
+    height: 1.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.phys-switch span {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.phys-toggle.on .phys-switch {
+    background: var(--accent);
+}
+
+.phys-toggle.on .phys-switch span {
+    transform: translateX(1.5rem);
+}
+
+/* --- text --- */
+.phys-note {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.phys-text {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 0.7rem;
+}
+
+.phys-info h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+}
+
+.phys-info p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* --- measurements --- */
+.phys-object {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.phys-object-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.phys-object .chip {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.phys-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.phys-metric {
+    display: flex;
+    flex-direction: column;
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+}
+
+.phys-metric-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.phys-metric-value {
+    font: 600 1.7rem/1.2 var(--font-display);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.phys-metric-value small {
+    font: 500 0.95rem var(--font-body);
+    color: var(--text-muted);
+}
+
+.phys-shot {
+    margin-top: 0.8rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+}
+
+.phys-shot-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.phys-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.6rem;
+    font-size: 1rem;
+    padding: 0.15rem 0;
+}
+
+.phys-row span {
+    color: var(--text-muted);
+}
+
+.phys-row b {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.phys-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.7rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.phys-legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.phys-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--phys);
+    box-shadow: 0 0 8px var(--phys);
+}
+
+.phys-arrow {
+    position: relative;
+    width: 1.3rem;
+    height: 0.22rem;
+    border-radius: 2px;
+    background: #4ade80;
+}
+
+.phys-arrow::after {
+    content: '';
+    position: absolute;
+    right: -0.35rem;
+    top: -0.3rem;
+    border-left: 0.45rem solid #4ade80;
+    border-top: 0.4rem solid transparent;
+    border-bottom: 0.4rem solid transparent;
+}
+
+/* --- Galileo --- */
+.btn.phys-big {
+    width: 100%;
+    min-height: 3.6rem;
+    font-size: 1.05rem;
+}
+
+.btn.phys-wide {
+    width: 100%;
+    margin-top: 0.7rem;
+}
+
+.phys-galileo {
+    margin-top: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.phys-bar-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+}
+
+.phys-bar-head b {
+    font-variant-numeric: tabular-nums;
+}
+
+.phys-bar-track {
+    height: 0.55rem;
+    margin-top: 0.25rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.phys-bar-track div {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease-out;
+}
+
+.phys-theory {
+    border-top: 1px dashed var(--border);
+    padding-top: 0.4rem;
+}
+
+.phys-conclusion {
+    font-size: 1rem;
+    line-height: 1.45;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* --- bottom hint --- */
+.chip.phys-hint {
+    font-size: 1rem;
+    padding: 0.5em 1.1em;
+    background: var(--surface-strong);
+    color: var(--text);
+}
