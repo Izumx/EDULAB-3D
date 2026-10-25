@@ -44,8 +44,10 @@ const KEYWORDS = {
     "dna": "DNA carries genetic instructions for development and functioning."
 };
 
-// User provided shared key
-const DEFAULT_API_KEY = "AIzaSyCISYhVqu2HkgLJk4cMwWXq9tqoa7SUVcA";
+// Requests go through the Vite dev-server proxy (vite.config.js), which adds the xkiro key server-side
+const AI_ENDPOINT = '/api/ai/chat/completions';
+const AI_MODEL = 'qwen/qwen3.7-flash:free';
+const HISTORY_LIMIT = 10;
 
 export const AIChatbot = ({ mode }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -53,9 +55,6 @@ export const AIChatbot = ({ mode }) => {
         { text: "Hi! I'm your AI Lab Assistant. How can I help?", sender: 'bot' }
     ]);
     const [input, setInput] = useState("");
-    // Use stored key or the default shared key
-    const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || DEFAULT_API_KEY);
-    const [showSettings, setShowSettings] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const messagesEndRef = useRef(null);
@@ -64,14 +63,6 @@ export const AIChatbot = ({ mode }) => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
-
-    // Save API Key
-    const saveApiKey = (key) => {
-        setApiKey(key);
-        localStorage.setItem('gemini_api_key', key);
-        setShowSettings(false);
-        setMessages(prev => [...prev, { text: "API Key saved! I'm ready to answer any question.", sender: 'bot' }]);
-    };
 
     // Context-aware greeting on mode switch
     useEffect(() => {
@@ -86,50 +77,45 @@ export const AIChatbot = ({ mode }) => {
         if (!input.trim()) return;
 
         const userMsg = input.trim();
-        setMessages(prev => [...prev, { text: userMsg, sender: 'user' }]);
+        const history = [...messages, { text: userMsg, sender: 'user' }];
+        setMessages(history);
         setInput("");
         setIsLoading(true);
 
-        if (!apiKey) {
-            setTimeout(() => {
-                setMessages(prev => [...prev, { text: "Please enter your Gemini API Key in settings to enable real AI features.", sender: 'bot' }]);
-                setShowSettings(true);
-                setIsLoading(false);
-            }, 500);
-            return;
-        }
-
         try {
-            // Call Gemini API
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+            const response = await fetch(AI_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `You are EduBot, an intelligent and helpful AI assistant in a 3D Science Education App called EduLab 3D. 
-                            The user is currently in the "${mode}" module. 
-                            If asked about the app, explain that it allows exploring Chemistry (molecules), Biology (cells), Physics (gravity), and Cosmos (planets).
-                            Keep answers concise, educational, and friendly.
-                            User Question: ${userMsg}`
-                        }]
-                    }]
+                    model: AI_MODEL,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `You are EduBot, an intelligent and helpful AI assistant in a 3D Science Education App called EduLab 3D.
+The user is currently in the "${mode}" module.
+If asked about the app, explain that it allows exploring Chemistry (molecules), Biology (cells), Physics (gravity), and Cosmos (planets).
+Keep answers concise, educational, and friendly. Answer in the same language the user writes in.`
+                        },
+                        ...history.slice(-HISTORY_LIMIT).map(m => ({
+                            role: m.sender === 'user' ? 'user' : 'assistant',
+                            content: m.text
+                        }))
+                    ]
                 })
             });
 
             const data = await response.json();
 
-            if (data.error) {
-                throw new Error(data.error.message || "API Error");
+            if (!response.ok || data.error) {
+                throw new Error(data.error?.message || `HTTP ${response.status}`);
             }
 
-            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I couldn't generate a response.";
+            const aiText = data.choices?.[0]?.message?.content || "I couldn't generate a response.";
             setMessages(prev => [...prev, { text: aiText, sender: 'bot' }]);
 
         } catch (error) {
             console.error("AI Error:", error);
-            setMessages(prev => [...prev, { text: "Error connecting to AI. Please check your API Key.", sender: 'bot' }]);
-            setShowSettings(true);
+            setMessages(prev => [...prev, { text: "Error connecting to AI. Is the dev server running with XKIRO_API_KEY in .env?", sender: 'bot' }]);
         } finally {
             setIsLoading(false);
         }
@@ -153,30 +139,13 @@ export const AIChatbot = ({ mode }) => {
                             <div className="ai-avatar">🤖</div>
                             <div>
                                 <h3>EduBot</h3>
-                                <span>{apiKey ? 'Online' : 'Setup Required'}</span>
+                                <span>Online</span>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: 5 }}>
-                            <button className="icon-btn" onClick={() => setShowSettings(!showSettings)} title="Settings">⚙️</button>
-                            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
-                        </div>
+                        <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
                     </header>
 
-                    {showSettings ? (
-                        <div className="ai-settings">
-                            <h3>⚙️ AI Settings</h3>
-                            <p>Enter your Google Gemini API Key to enable the full AI experience.</p>
-                            <input
-                                type="password"
-                                placeholder="Paste API Key here..."
-                                defaultValue={apiKey}
-                                onBlur={(e) => saveApiKey(e.target.value)}
-                            />
-                            <p className="hint">Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">Google AI Studio</a></p>
-                            <button onClick={() => setShowSettings(false)} className="save-btn">Back to Chat</button>
-                        </div>
-                    ) : (
-                        <>
+                    <>
                             <div className="ai-messages">
                                 {messages.map((msg, i) => (
                                     <div key={i} className={`message ${msg.sender}`}>
@@ -196,15 +165,14 @@ export const AIChatbot = ({ mode }) => {
                             <form className="ai-input-area" onSubmit={handleSend}>
                                 <input
                                     type="text"
-                                    placeholder={apiKey ? "Ask anything..." : "Setup required..."}
+                                    placeholder="Ask anything..."
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     disabled={isLoading}
                                 />
                                 <button type="submit" disabled={isLoading}>{isLoading ? '...' : 'Send'}</button>
                             </form>
-                        </>
-                    )}
+                    </>
                 </div>
             )}
         </div>
