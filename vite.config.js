@@ -8,6 +8,20 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      chunkSizeWarningLimit: 800, // three.js alone is ~720 kB; it is cached separately
+      rollupOptions: {
+        output: {
+          // Big libraries in their own files: they change rarely, so the browser keeps them cached between updates
+          manualChunks(id) {
+            if (!id.includes('node_modules') || id.includes('@mediapipe')) return undefined // MediaPipe loads on demand
+            // three.js has no dependencies, so it can live alone; React and its renderers must stay together
+            // (splitting them creates circular chunks that crash at start-up)
+            return id.includes('/node_modules/three/') ? 'three' : 'vendor'
+          },
+        },
+      },
+    },
     server: {
       proxy: {
         '/api/ai': {
