@@ -377,3 +377,186 @@
     border-color: var(--success);
     box-shadow: 0 0 30px color-mix(in srgb, var(--success) 35%, transparent);
 }
+
+/* ---------- mode switch ---------- */
+.chem-seg {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: calc(var(--radius-sm) + 0.25rem);
+    background: rgba(7, 11, 22, 0.7);
+    border: 1px solid var(--border);
+}
+
+.chem-seg .btn {
+    min-height: 2.6rem;
+    background: transparent;
+    border-color: transparent;
+}
+
+.chem-seg .btn.active {
+    background: var(--accent);
+    color: #05101a;
+}
+
+/* ---------- reactions ---------- */
+.rx-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+
+.btn.rx-item {
+    position: relative;
+    min-height: 2.9rem;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.9rem;
+    line-height: 1.15;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.rx-check {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.btn.rx-item.active .rx-check {
+    color: #05101a;
+}
+
+.rx-panel {
+    display: grid;
+    gap: 0.3rem;
+}
+
+.rx-group-title {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.rx-step {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.rx-step .btn-icon {
+    width: 2.7rem;
+    min-height: 2.7rem;
+    font-size: 1.4rem;
+}
+
+.rx-step-value {
+    min-width: 1.6rem;
+    text-align: center;
+    font: 600 1.5rem var(--font-display);
+    color: var(--accent);
+}
+
+.rx-step-name {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0.3rem;
+    line-height: 1.15;
+}
+
+.rx-step-name b {
+    font: 600 1.15rem var(--font-display);
+}
+
+.rx-step-name small {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.rx-step-name sub,
+.rx-equation sub,
+.rx-panel sub {
+    font-size: 0.65em;
+    line-height: 0;
+}
+
+.rx-balance {
+    width: 100%;
+    margin-top: 0.4rem;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.rx-balance th {
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 0 0.3rem 0.2rem;
+}
+
+.rx-balance td {
+    padding: 0.15rem 0.3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-weight: 600;
+}
+
+.rx-balance td i {
+    display: inline-block;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    vertical-align: -0.05rem;
+}
+
+.rx-balance tr.ok td:last-child {
+    color: var(--success);
+}
+
+.rx-balance tr.bad td:last-child {
+    color: var(--danger);
+}
+
+.rx-status {
+    margin-top: 0.3rem;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+}
+
+.rx-status.ok {
+    color: var(--success);
+}
+
+.rx-name {
+    font-size: 1.35rem;
+}
+
+.rx-text {
+    font-size: 0.95rem;
+}
+
+.lab-toast.rx-toast {
+    top: auto;
+    bottom: 6.4rem;
+    padding: 0.5rem 1.4rem;
+    background: rgba(7, 11, 22, 0.78);
+}
+
+.rx-equation {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font: 600 1.8rem/1.2 var(--font-display);
+}
+
+.rx-coef {
+    color: var(--accent);
+    margin-right: 0.08em;
+}
+
+.rx-op {
+    color: var(--text-muted);
+}
+
+.rx-arrow {
+    margin: 0 0.3rem;
+}

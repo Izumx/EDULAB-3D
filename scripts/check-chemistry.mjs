@@ -3,6 +3,7 @@
 // Run: node scripts/check-chemistry.mjs
 import { MOLECULES } from '../src/labs/chemistry/molecules.js';
 import { ELEMENTS } from '../src/labs/chemistry/elements.js';
+import { REACTIONS, balanceRows, isBalanced } from '../src/labs/chemistry/reactions.js';
 import { MAX_ATOMS, TASKS, atomTotal, countAtoms, findExact, hillFormula, molarMass, suggestions } from '../src/labs/chemistry/match.js';
 
 let problems = 0;
@@ -36,7 +37,18 @@ for (const m of MOLECULES) {
 
 for (const id of TASKS) if (!MOLECULES.some(m => m.id === id)) fail(`task ${id} is not in the catalog`);
 
-console.log(`${MOLECULES.length} recipes and ${TASKS.length} tasks checked.`);
+for (const r of REACTIONS) {
+    const missing = [...r.left, ...r.right].filter(([id]) => !MOLECULES.some(m => m.id === id));
+    if (missing.length) { fail(`reaction ${r.id}: unknown molecules ${missing.map(x => x[0])}`); continue; }
+    const rows = balanceRows(r, r.left.map(x => x[1]), r.right.map(x => x[1]));
+    if (!isBalanced(rows)) fail(`reaction ${r.id} is not balanced: ${rows.map(x => `${x.el} ${x.left}/${x.right}`).join(', ')}`);
+    // the starting state (all coefficients 1) must not already be balanced, otherwise there is nothing to do
+    if (isBalanced(balanceRows(r, r.left.map(() => 1), r.right.map(() => 1))) && [...r.left, ...r.right].some(x => x[1] !== 1)) {
+        fail(`reaction ${r.id} is balanced with all coefficients 1 but lists others`);
+    }
+}
+
+console.log(`${MOLECULES.length} recipes, ${TASKS.length} tasks and ${REACTIONS.length} reactions checked.`);
 console.log('Examples:', ['H2O', 'CO2', 'SO3', 'O3'].map(id => {
     const m = MOLECULES.find(x => x.id === id);
     return `${id} = ${hillFormula(m.comp)} (${molarMass(m.comp)} г/моль)`;

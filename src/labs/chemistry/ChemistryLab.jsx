@@ -9,6 +9,7 @@ import {
     suggestions,
 } from './match';
 import ChemScene from './ChemScene';
+import ReactionMode from './ReactionMode';
 import './chemistry.css';
 
 const CAMERA = { position: [0, 0.4, 12], fov: 45, near: 0.1, far: 120 };
@@ -198,6 +199,7 @@ export default function ChemistryLab({ onBack }) {
     const [shakeKey, setShakeKey] = useState(0);
     const [picked, setPicked] = useState(null);
     const [labels, setLabels] = useState(true);
+    const [mode, setMode] = useState('build'); // 'build' | 'react'
     const [hints, setHints] = useState(false);
     const [message, setMessage] = useState('');
     const [task, setTask] = useState(null); // { mol, revealed, done }
@@ -302,8 +304,30 @@ export default function ChemistryLab({ onBack }) {
     const formed = !!mol;
     const total = atomTotal(comp);
 
+    const modeSwitch = (
+        <div className="chem-seg" role="group" aria-label="Режим">
+            <button className={`btn${mode === 'build' ? ' active' : ''}`} onClick={() => { setMode('build'); zoom.current = 1; }}>Конструктор</button>
+            <button className={`btn${mode === 'react' ? ' active' : ''}`} onClick={() => { setMode('react'); zoom.current = 1; }}>Реакции</button>
+        </div>
+    );
+
+    if (mode === 'react') {
+        return (
+            <LabShell title="Химия" subtitle="Химические реакции" icon="🧪" accent="var(--chem)" onBack={onBack}
+                actions={(
+                    <div className="chem-view">
+                        {modeSwitch}
+                        <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>Подписи</button>
+                    </div>
+                )}>
+                <ReactionMode labels={labels} zoom={zoom} />
+            </LabShell>
+        );
+    }
+
     const viewControls = (
         <div className="chem-view">
+            {modeSwitch}
             <button className={`btn${task ? ' active' : ''}`} onClick={nextTask}>🎯 Задание</button>
             <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>Подписи</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(1.18)} aria-label="Отдалить">−</button>
