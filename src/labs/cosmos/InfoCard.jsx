@@ -2,14 +2,13 @@
 import React from 'react';
 import { ballScale, formatKm, formatMkm } from './bodies';
 
-function Row({ label, value, sub }) {
+// One fact as a compact tile; the card shows them in two columns so it fits a 768 px tall projector screen
+function Stat({ label, value, sub, wide }) {
     return (
-        <div className="cosmos-row">
-            <div className="cosmos-row-label">{label}</div>
-            <div className="cosmos-row-value">
-                {value}
-                {sub && <span className="cosmos-row-sub">{sub}</span>}
-            </div>
+        <div className={`cosmos-stat${wide ? ' wide' : ''}`}>
+            <div className="cosmos-stat-label">{label}</div>
+            <div className="cosmos-stat-value">{value}</div>
+            {sub && <div className="cosmos-stat-sub">{sub}</div>}
         </div>
     );
 }
@@ -33,21 +32,20 @@ export function InfoCard({ body, onClose, onSelect }) {
                 <button className="btn btn-icon btn-ghost cosmos-card-close" onClick={onClose} aria-label="Закрыть">✕</button>
             </div>
 
-            <Row label="Диаметр" value={formatKm(body.diameter)}
-                sub={body.id === 'earth' ? 'экваториальный' : `${body.xEarth} × Земля`} />
-            {isPlanet && <Row label="Расстояние от Солнца" value={formatMkm(body.aMkm)} sub={`${body.au} а.е.`} />}
-            {body.kind === 'moon' && <Row label="Расстояние от Земли" value={formatKm(body.distKm)} />}
-            {body.period && <Row label={body.kind === 'moon' ? 'Период обращения' : 'Год (оборот вокруг Солнца)'} value={body.period} />}
-            <Row label="Сутки (оборот вокруг оси)" value={body.day} />
-            {isPlanet && <Row label="Спутники" value={moonsText(body)} sub={body.moons > 2 ? 'по данным на 2025 г.' : null} />}
-            <Row label={isPlanet ? 'Средняя температура' : 'Температура'} value={body.temp} />
-            {body.extra?.map(([l, v]) => <Row key={l} label={l} value={v} />)}
-            {body.kind !== 'star' && <Row label="Если Солнце — мяч 30 см" value={ballScale(body)} />}
-
-            <div className="cosmos-fact">
-                <span aria-hidden="true">💡</span>
-                <p>{body.fact}</p>
+            <div className="cosmos-stats">
+                <Stat label="Диаметр" value={formatKm(body.diameter)}
+                    sub={body.id === 'earth' ? 'экваториальный' : `${body.xEarth} × Земля`} />
+                {isPlanet && <Stat label="От Солнца" value={formatMkm(body.aMkm)} sub={`${body.au} а.е.`} />}
+                {body.kind === 'moon' && <Stat label="От Земли" value={formatKm(body.distKm)} />}
+                {body.period && <Stat label={body.kind === 'moon' ? 'Оборот вокруг Земли' : 'Год'} value={body.period} />}
+                <Stat label="Сутки" value={body.day} />
+                {isPlanet && <Stat label="Спутники" value={moonsText(body)} sub={body.moons > 2 ? 'данные 2025 г.' : null} />}
+                <Stat label={isPlanet ? 'Температура (средняя)' : 'Температура'} value={body.temp} />
+                {body.extra?.map(([l, v]) => <Stat key={l} label={l} value={v} />)}
+                {body.kind !== 'star' && <Stat wide label="Если Солнце — мяч 30 см" value={ballScale(body)} />}
             </div>
+
+            <p className="cosmos-fact"><span aria-hidden="true">💡 </span>{body.fact}</p>
 
             {body.id === 'earth' && (
                 <button className="btn cosmos-card-link" onClick={() => onSelect('moon')}>🌙 Луна — спутник Земли</button>
