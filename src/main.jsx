@@ -11,6 +11,9 @@ import '@fontsource/unbounded/700.css'
 import './styles/global.css'
 import App from './App.jsx'
 
+// Hand emulation for development and automated tests (no camera needed)
+if (import.meta.env.DEV) import('./hand/devHand.js')
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
