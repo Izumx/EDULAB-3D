@@ -1,4 +1,4 @@
-// Biology lab: cut-away animal and plant cells and the DNA double helix (hand + mouse control).
+// Biology lab: cut-away animal and plant cells, the DNA double helix and mitosis (hand + mouse control).
 import React, { Suspense, lazy, useCallback, useRef, useState } from 'react';
 import { LabShell } from '../../ui/LabShell';
 import { LabCanvas } from '../../ui/three';
@@ -6,16 +6,22 @@ import { useHandStatus } from '../../hand/handStore';
 import {
     ANIMAL_LIST, CELL_INFO, DNA_INFO, DNA_LIST, DNA_PARTS, ONLY_ANIMAL, ONLY_PLANT, ORGANELLES, PLANT_LIST, REPLICATION_INFO,
 } from './content';
+import { MitosisBar, PhaseCard, PhaseList } from './MitosisPanels';
+import { PHASE_COUNT } from './mitosis';
 import './biology.css';
 
 const CellScene = lazy(() => import('./CellScene'));
 const DnaScene = lazy(() => import('./DnaScene'));
+const MitosisScene = lazy(() => import('./MitosisScene'));
 
 const VIEWS = [
     { id: 'animal', label: 'Животная клетка' },
     { id: 'plant', label: 'Растительная клетка' },
     { id: 'dna', label: 'ДНК' },
+    { id: 'mitosis', label: 'Деление клетки' },
 ];
+
+const HOLD = 0.85; // where a phase button stops: the parts of that phase are in place
 
 const EMPTY = new Set();
 const CAMERA = { position: [0, 1, 12], fov: 45, near: 0.1, far: 100 };
@@ -99,8 +105,26 @@ export default function BiologyLab({ onBack }) {
     const [labels, setLabels] = useState(true);
     const [unzip, setUnzip] = useState(false);
     const [nonce, setNonce] = useState(0);
+    const [mitoT, setMitoT] = useState(HOLD);
+    const [playing, setPlaying] = useState(false);
+    const [goto, setGoto] = useState({ t: HOLD });
     const zoom = useRef(1);
     const { present } = useHandStatus();
+
+    const phase = Math.min(PHASE_COUNT - 1, Math.floor(mitoT));
+    const gotoPhase = i => {
+        setPlaying(false);
+        setGoto({ t: Math.max(0, Math.min(PHASE_COUNT - 1, i)) + HOLD });
+    };
+    const scrub = value => {
+        setPlaying(false);
+        setGoto({ t: value });
+    };
+    const togglePlay = () => {
+        // from the end of telophase, start again
+        if (!playing && mitoT > PHASE_COUNT - 0.2) setGoto({ t: 0 });
+        setPlaying(p => !p);
+    };
 
     // Selecting the same part again clears the selection
     const select = useCallback(id => setSelected(cur => (cur === id ? null : id)), []);
@@ -110,6 +134,7 @@ export default function BiologyLab({ onBack }) {
         setLabels(id !== 'plant'); // the plant cell has many parts, so its names start hidden
         setSelected(null);
         setUnzip(false);
+        setPlaying(false);
         zoom.current = 1;
     };
 
@@ -124,6 +149,7 @@ export default function BiologyLab({ onBack }) {
     };
 
     const dna = view === 'dna';
+    const mitosis = view === 'mitosis';
     const part = selected ? (dna ? DNA_PARTS : ORGANELLES)[selected] : null;
 
     const tabs = (
@@ -135,25 +161,37 @@ export default function BiologyLab({ onBack }) {
     );
 
     return (
-        <LabShell title="Биология" subtitle={dna ? 'Молекула ДНК' : 'Строение клетки'} icon="🧬" accent="var(--bio)" onBack={onBack} actions={tabs}>
+        <LabShell title="Биология" subtitle={dna ? 'Молекула ДНК' : mitosis ? 'Митоз' : 'Строение клетки'} icon="🧬" accent="var(--bio)" onBack={onBack} actions={tabs}>
             <LabCanvas camera={CAMERA} onCreated={onCreated}>
                 <Suspense fallback={null}>
-                    {dna
+                    {mitosis
+                        ? <MitosisScene key="mitosis" playing={playing} goto={goto} onProgress={setMitoT} showLabels={labels} zoom={zoom} phase={phase} />
+                        : dna
                         ? <DnaScene key="dna" selected={selected} onSelect={select} unzip={unzip} zoom={zoom} showLabels={labels} />
                         : <CellScene key={view} type={view} selected={selected} onSelect={select} showLabels={labels} zoom={zoom} viewNonce={nonce} />}
                 </Suspense>
             </LabCanvas>
 
             <aside className="lab-left bio-left">
-                <PartList view={view} selected={selected} onSelect={select} />
+                {mitosis
+                    ? <PhaseList phase={phase} onPick={gotoPhase} />
+                    : <PartList view={view} selected={selected} onSelect={select} />}
             </aside>
 
             <aside className="lab-right bio-right">
-                {part
+                {mitosis
+                    ? <PhaseCard phase={phase} />
+                    : part
                     ? <PartCard part={part} onClose={() => setSelected(null)} />
                     : <IntroCard view={view} unzip={unzip} handPresent={present} />}
             </aside>
 
+            {mitosis ? (
+                <nav className="lab-bottom bio-bar" aria-label="Ход деления">
+                    <MitosisBar t={mitoT} playing={playing} onPlay={togglePlay} onStep={d => gotoPhase(phase + d)}
+                        onScrub={scrub} labels={labels} onLabels={() => setLabels(v => !v)} />
+                </nav>
+            ) : (
             <nav className="lab-bottom bio-bar" aria-label="Управление">
                 <button className="btn btn-icon bio-zoom" onClick={() => zoomBy(1.18)} aria-label="Отдалить">−</button>
                 <button className={`btn${!selected ? ' active' : ''}`} onClick={overview}>Обзор</button>
@@ -165,6 +203,7 @@ export default function BiologyLab({ onBack }) {
                     </button>
                 )}
             </nav>
+            )}
         </LabShell>
     );
 }
