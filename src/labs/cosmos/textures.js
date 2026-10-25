@@ -102,6 +102,8 @@ export function getTexture(file, { color = true } = {}) {
     new THREE.ImageLoader().load(
         BASE + file,
         img => {
+            // The fallback may already be uploaded with another size; dispose so the GPU storage is re-created
+            tex.dispose();
             tex.image = img;
             tex.needsUpdate = true;
         },

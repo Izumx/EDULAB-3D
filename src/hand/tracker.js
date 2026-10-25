@@ -1,6 +1,5 @@
 // Single app-wide webcam + MediaPipe Gesture Recognizer.
 // Everything (WASM + model) is served from this app, so it works on school networks that block CDNs.
-import { GestureRecognizer } from '@mediapipe/tasks-vision';
 import wasmLoaderPath from '@mediapipe/tasks-vision/vision_wasm_internal.js?url';
 import wasmBinaryPath from '@mediapipe/tasks-vision/vision_wasm_internal.wasm?url';
 import { hand, emitHand } from './handStore';
@@ -43,6 +42,8 @@ export function getVideoStream() {
 }
 
 async function createRecognizer(delegate) {
+    // Loaded on demand: the menu opens faster, and the library is only needed once the camera is switched on
+    const { GestureRecognizer } = await import('@mediapipe/tasks-vision');
     // Self-hosted fileset (bundled by Vite, version-locked to the JS package) instead of FilesetResolver's CDN default
     const fileset = { wasmLoaderPath, wasmBinaryPath };
     return GestureRecognizer.createFromOptions(fileset, {
