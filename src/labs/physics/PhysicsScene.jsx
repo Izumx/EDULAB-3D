@@ -39,7 +39,7 @@ function fitCamera(camera, w, h) {
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 18;
     const side = Math.min(19 * rem, 0.27 * w) + 2.2 * rem;
     const top = 76 + 0.6 * rem;
-    const bottom = 4.4 * rem;
+    const bottom = 13.2 * rem; // the measurements bar lives under the room
     const availW = Math.max(w - 2 * side, w * 0.45);
     const availH = Math.max(h - top - bottom, h * 0.5);
     const ppm = Math.min(availW / (ROOM.w * 1.08 + 0.3), availH / (ROOM.h * 1.08 + 0.3));

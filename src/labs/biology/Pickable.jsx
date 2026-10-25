@@ -5,6 +5,21 @@ import * as THREE from 'three';
 import { PickCtx, isRelated } from './pick';
 import { noRaycast } from './materials';
 
+
+// Applies the glow / dim state to every collected material
+function applyLook(mats, s, g, glowColor) {
+    for (const m of mats) {
+        const b = m.userData.hl;
+        if (b.color) m.color.copy(b.color).multiplyScalar(1 - 0.62 * s.dim);
+        if (b.emissive) {
+            m.emissive.copy(b.emissive).lerp(glowColor, Math.min(1, s.glow));
+            m.emissiveIntensity = b.ei * (1 - s.dim) + g * 0.75;
+        }
+        if (b.opacity < 1) m.opacity = b.opacity * (1 - 0.5 * s.dim) + 0.15 * g;
+        if (b.intensity !== undefined) m.uniforms.uIntensity.value = b.intensity * (1 - 0.7 * s.dim) + g * 1.2;
+    }
+}
+
 /**
  * Children meshes can opt out with userData: noPick (not raycastable), noClip (ignore the cut-away planes).
  * hand={false}: only mouse/list can select it (used for big background parts like the cytoplasm).
@@ -15,30 +30,32 @@ export function Pickable({ id, label, color, hand = true, hoverGlow = true, chil
     const fx = useRef({ glow: 0, dim: 0, clean: false, mats: [] });
     const glowColor = useMemo(() => new THREE.Color(color).multiplyScalar(1.15), [color]);
 
-    // Collect materials once (remember their base look) and wire clipping + raycasting
+    // Collect materials once (remember their base look) and wire clipping + raycasting.
+    // Runs twice in StrictMode, so already-registered materials must still be collected.
     useLayoutEffect(() => {
-        const mats = [];
+        const mats = new Set();
         ref.current.traverse(o => {
             if (o.isPoints || o.isLine || o.userData.noPick) o.raycast = noRaycast;
             else if (o.isMesh && ctx.raycast && !o.userData.noClip) o.raycast = ctx.raycast;
             const list = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
             for (const m of list) {
-                if (m.userData.hl) continue;
-                m.userData.hl = {
-                    color: m.color ? m.color.clone() : null,
-                    emissive: m.emissive ? m.emissive.clone() : null,
-                    ei: m.emissiveIntensity ?? 1,
-                    opacity: m.opacity,
-                    intensity: m.uniforms?.uIntensity?.value,
-                };
+                if (!m.userData.hl) {
+                    m.userData.hl = {
+                        color: m.color ? m.color.clone() : null,
+                        emissive: m.emissive ? m.emissive.clone() : null,
+                        ei: m.emissiveIntensity ?? 1,
+                        opacity: m.opacity,
+                        intensity: m.uniforms?.uIntensity?.value,
+                    };
+                }
                 if (ctx.planes && !o.userData.noClip) {
                     m.clippingPlanes = ctx.planes;
                     m.clipIntersection = true;
                 }
-                mats.push(m);
+                mats.add(m);
             }
         });
-        fx.current.mats = mats;
+        fx.current.mats = [...mats];
         fx.current.clean = false;
     }, [ctx]);
 
@@ -57,16 +74,7 @@ export function Pickable({ id, label, color, hand = true, hoverGlow = true, chil
 
         const pulse = sel === id ? 0.8 + 0.2 * Math.sin(state.clock.elapsedTime * 3.2) : 1;
         const g = s.glow * pulse;
-        for (const m of s.mats) {
-            const b = m.userData.hl;
-            if (b.color) m.color.copy(b.color).multiplyScalar(1 - 0.62 * s.dim);
-            if (b.emissive) {
-                m.emissive.copy(b.emissive).lerp(glowColor, Math.min(1, s.glow));
-                m.emissiveIntensity = b.ei * (1 - s.dim) + g * 0.75;
-            }
-            if (b.opacity < 1) m.opacity = b.opacity * (1 - 0.5 * s.dim) + 0.15 * g;
-            if (b.intensity !== undefined) m.uniforms.uIntensity.value = b.intensity * (1 - 0.7 * s.dim) + g * 1.2;
-        }
+        applyLook(s.mats, s, g, glowColor);
     });
 
     const select = e => {

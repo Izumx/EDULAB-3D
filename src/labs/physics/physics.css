@@ -22,7 +22,7 @@
 .phys-presets {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .btn.phys-preset {
@@ -32,8 +32,8 @@
     column-gap: 0.55rem;
     justify-items: start;
     align-items: center;
-    min-height: 3.6rem;
-    padding: 0.45rem 0.7rem;
+    min-height: 3rem;
+    padding: 0.3rem 0.65rem;
     text-align: left;
 }
 
@@ -43,7 +43,7 @@
 
 .phys-preset-icon {
     grid-row: span 2;
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     line-height: 1;
 }
 
@@ -71,8 +71,15 @@
 .phys-g-row {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
-    margin-top: 0.9rem;
+    gap: 0;
+    margin-top: 0.6rem;
+}
+
+.phys-g-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
 }
 
 .phys-g-label {
@@ -81,7 +88,7 @@
 }
 
 .phys-g-value {
-    font: 600 1.55rem/1.2 var(--font-display);
+    font: 600 1.4rem/1.2 var(--font-display);
     color: var(--accent);
 }
 
@@ -94,7 +101,7 @@
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 2.4rem;
+    height: 2.2rem;
     margin: 0;
     background: transparent;
     cursor: pointer;
@@ -154,7 +161,7 @@
 .btn.phys-toggle {
     width: 100%;
     justify-content: space-between;
-    margin-top: 0.7rem;
+    margin-top: 0.5rem;
 }
 
 .phys-switch {
@@ -194,9 +201,9 @@
 }
 
 .phys-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--text-muted);
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.6rem;
 }
 
 .phys-info h3 {
@@ -206,8 +213,8 @@
 }
 
 .phys-info p {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 0.93rem;
+    line-height: 1.4;
 }
 
 /* --- measurements --- */
@@ -239,7 +246,7 @@
 .phys-metric {
     display: flex;
     flex-direction: column;
-    padding: 0.55rem 0.7rem;
+    padding: 0.4rem 0.65rem;
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border);
@@ -251,7 +258,7 @@
 }
 
 .phys-metric-value {
-    font: 600 1.7rem/1.2 var(--font-display);
+    font: 600 1.4rem/1.15 var(--font-display);
     color: var(--accent);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -263,8 +270,8 @@
 }
 
 .phys-shot {
-    margin-top: 0.8rem;
-    padding-top: 0.7rem;
+    margin-top: 0.6rem;
+    padding-top: 0.5rem;
     border-top: 1px solid var(--border);
 }
 
@@ -293,9 +300,9 @@
 
 .phys-legend {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin-top: 0.7rem;
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+    margin-top: 0.5rem;
     font-size: 0.9rem;
     color: var(--text-muted);
 }
@@ -335,13 +342,13 @@
 /* --- Galileo --- */
 .btn.phys-big {
     width: 100%;
-    min-height: 3.6rem;
+    min-height: 3.3rem;
     font-size: 1.05rem;
 }
 
 .btn.phys-wide {
     width: 100%;
-    margin-top: 0.7rem;
+    margin-top: 0.6rem;
 }
 
 .phys-galileo {
@@ -389,10 +396,110 @@
     border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
-/* --- bottom hint --- */
-.chip.phys-hint {
-    font-size: 1rem;
-    padding: 0.5em 1.1em;
-    background: var(--surface-strong);
-    color: var(--text);
+/* --- shot grid --- */
+.phys-shot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.phys-shot-grid div {
+    display: flex;
+    flex-direction: column;
+}
+
+.phys-shot-grid span {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.phys-shot-grid b {
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* --- bottom bar: measurements and experiment result --- */
+/* Fits between the camera preview (bottom-left) and the right column, so it never covers a control */
+.lab-bottom.phys-bottom {
+    left: 290px;
+    right: calc(min(19rem, 27vw) + 2rem);
+    bottom: 1rem;
+    transform: none;
+}
+
+.phys-bottom .panel {
+    width: 100%;
+    padding: 0.65rem 1.1rem 0.7rem;
+}
+
+.phys-measure-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 0.7rem;
+    align-items: center;
+}
+
+.phys-measure .phys-object {
+    margin: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.phys-measure .phys-shot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.5rem 0 0;
+    padding: 0.4rem 0 0;
+}
+
+.phys-measure .phys-shot-title {
+    margin: 0;
+    max-width: 15rem;
+    line-height: 1.25;
+}
+
+.phys-measure .phys-shot-grid {
+    flex: 1;
+    margin: 0;
+}
+
+.phys-measure .phys-legend {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    gap: 0.05rem 1.1rem;
+}
+
+.phys-info-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+}
+
+.phys-info-head h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.phys-foot {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+.phys-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+}
+
+.phys-result .phys-conclusion {
+    margin-top: 0.6rem;
 }
