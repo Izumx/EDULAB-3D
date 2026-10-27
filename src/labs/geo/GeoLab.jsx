@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { LabShell } from '../../ui/LabShell';
 import GlobeMode from './GlobeMode';
+import { initialLabMode, rememberLabMode } from '../../ui/labMode';
 import SeasonsMode from './SeasonsMode';
 import './geo.css';
 
@@ -11,7 +12,11 @@ const MODES = [
 ];
 
 export default function GeoLab({ onBack }) {
-    const [mode, setMode] = useState('globe');
+    const [mode, setModeState] = useState(() => initialLabMode('globe', MODES.map(m => m.id)));
+    const setMode = m => {
+        setModeState(m);
+        rememberLabMode(m);
+    };
     const current = MODES.find(m => m.id === mode);
     const tabs = (
         <div className="geo-seg" role="group" aria-label="Режим">
@@ -21,7 +26,7 @@ export default function GeoLab({ onBack }) {
         </div>
     );
     return (
-        <LabShell title="География" subtitle={current.subtitle} icon="🌍" accent="var(--geo)" onBack={onBack} actions={tabs}>
+        <LabShell title="География" subtitle={current.subtitle} subject="geo" onBack={onBack} actions={tabs}>
             {mode === 'globe' ? <GlobeMode /> : <SeasonsMode />}
         </LabShell>
     );

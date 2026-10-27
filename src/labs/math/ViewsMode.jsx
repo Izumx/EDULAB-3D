@@ -1,5 +1,6 @@
 // «Виды» mode: build a figure from cubes and compare its three views; in task mode rebuild a figure from its views.
 import React, { useEffect, useRef, useState } from 'react';
+import { Dices, PartyPopper, Target } from 'lucide-react';
 import { LabCanvas } from '../../ui/three';
 import VoxelScene from './VoxelScene';
 import { HeightGrid, ViewTriple } from './ViewsPanels';
@@ -29,7 +30,7 @@ export default function ViewsMode() {
             const identical = next.every((v, i) => v === task.target[i]);
             setTask(t => ({ ...t, done: true }));
             setSolved(n => n + 1);
-            setToast({ ok: true, text: identical ? '🎉 Верно! Все три вида совпали.' : '🎉 Верно! Все три вида совпали. У этих видов бывает несколько разных фигур — вы нашли одну из них.' });
+            setToast({ ok: true, text: identical ? 'Верно! Все три вида совпали.' : 'Верно! Все три вида совпали. У этих видов бывает несколько разных фигур — вы нашли одну из них.' });
         }
     };
 
@@ -80,7 +81,7 @@ export default function ViewsMode() {
             <aside className="lab-right math-right">
                 {task ? (
                     <div className="panel math-card views-card">
-                        <div className="panel-title">🎯 Постройте фигуру · решено {solved}</div>
+                        <div className="panel-title"><Target className="ico" aria-hidden="true" />Постройте фигуру · решено {solved}</div>
                         <div className="views-sub">Дано: три вида</div>
                         <ViewTriple heights={task.target} compact />
                         <div className="views-sub">Ваша фигура</div>
@@ -93,20 +94,20 @@ export default function ViewsMode() {
                         <ViewTriple heights={heights} showHeights />
                         <p className="math-note">
                             Ставьте кубики — виды меняются сразу. Число на виде сверху — высота башни. Сначала угадайте, как изменится вид слева,
-                            потом добавьте кубик. А ещё попробуйте «🎯 Задание»: соберите фигуру по её видам.
+                            потом добавьте кубик. А ещё попробуйте «Задание»: соберите фигуру по её видам.
                         </p>
                     </div>
                 )}
             </aside>
 
-            {toast && <div className={`lab-toast views-toast${toast.ok ? ' ok' : ''}`} role="status">{toast.text}</div>}
+            {toast && <div className={`lab-toast views-toast${toast.ok ? ' ok' : ''}`} role="status">{toast.ok && <PartyPopper aria-hidden="true" />}{toast.text}</div>}
 
             <nav className="lab-bottom math-bar" aria-label="Действия">
                 <button className="btn btn-icon math-zoom" onClick={() => { zoom.current = Math.min(1.7, zoom.current * 1.18); }} aria-label="Отдалить">−</button>
                 <button className="btn btn-icon math-zoom" onClick={() => { zoom.current = Math.max(0.55, zoom.current * 0.85); }} aria-label="Приблизить">+</button>
                 <button className="btn" onClick={clear} disabled={cubeCount(heights) === 0}>Очистить</button>
-                {!task && <button className="btn" onClick={randomOne}>🎲 Случайная фигура</button>}
-                <button className={`btn${task ? '' : ' btn-primary'}`} onClick={newTask}>{task ? '🎯 Новое задание' : '🎯 Задание'}</button>
+                {!task && <button className="btn" onClick={randomOne}><Dices /> Случайная фигура</button>}
+                <button className={`btn${task ? '' : ' btn-primary'}`} onClick={newTask}><Target />{task ? 'Новое задание' : 'Задание'}</button>
                 {task && !task.hint && <button className="btn" onClick={() => setTask(t => ({ ...t, hint: true }))}>Подсказка</button>}
                 {task && <button className="btn btn-ghost" onClick={() => { setTask(null); setToast(null); }}>Завершить</button>}
             </nav>

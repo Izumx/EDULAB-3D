@@ -15,12 +15,17 @@
     width: 88px;
     height: 88px;
     border-radius: 26px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     background: linear-gradient(145deg, #38bdf8, #6366f1);
     color: #fff;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(56, 189, 248, 0.45);
-    transition: transform 0.2s;
+    box-shadow: 0 5px 0 #3730a3, 0 12px 30px rgba(56, 189, 248, 0.35);
+    transition: transform 0.2s, box-shadow 0.1s;
+}
+
+.ai-fab:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #3730a3, 0 6px 18px rgba(56, 189, 248, 0.3);
 }
 
 .ai-fab:hover,
@@ -29,12 +34,13 @@
 }
 
 .ai-fab-icon {
-    font-size: 2.1rem;
-    line-height: 1;
+    width: 2.3rem;
+    height: 2.3rem;
+    stroke-width: 2.1;
 }
 
 .ai-fab-text {
-    font: 600 0.8rem var(--font-body);
+    font: 800 0.85rem var(--font-body);
 }
 
 .ai-window {
@@ -64,8 +70,13 @@
     width: 2.8rem;
     height: 2.8rem;
     border-radius: 14px;
-    font-size: 1.5rem;
+    color: #fff;
     background: linear-gradient(145deg, #38bdf8, #6366f1);
+}
+
+.ai-avatar svg {
+    width: 1.6rem;
+    height: 1.6rem;
 }
 
 .ai-header-text {

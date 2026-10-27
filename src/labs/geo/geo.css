@@ -139,8 +139,15 @@
 }
 
 .geo-stars {
+    display: inline-flex;
+    gap: 0.1em;
+    vertical-align: -0.15em;
+    color: rgba(251, 191, 36, 0.45);
+}
+
+.geo-stars .ico.on {
     color: #fbbf24;
-    letter-spacing: 0.1em;
+    fill: #fbbf24;
 }
 
 /* coordinates under the pointer */

@@ -1,5 +1,6 @@
 // Physics lab: gravity and motion. Grab, drop and throw bodies in a room; switch planets; repeat Galileo's experiment.
 import React, { useCallback, useEffect, useState } from 'react';
+import { Feather, Hand, Repeat, RotateCcw, Satellite, SlidersHorizontal, Snail, Wind } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
 import { PhysicsStage } from './PhysicsScene';
 import { PRESETS, OBJECTS, BODY_INDEX, GALILEO_HEIGHT, EARTH_G } from './data';
@@ -7,6 +8,13 @@ import { resetWorld, setParams, selectBody, startGalileo } from './engine';
 import './physics.css';
 
 const G_MAX = 30;
+
+// A small planet disc in the planet's colour; weightlessness gets a space station icon
+function PresetIcon({ preset }) {
+    if (!preset) return <SlidersHorizontal className="ico" aria-hidden="true" />;
+    if (!preset.dot) return <Satellite className="ico" aria-hidden="true" />;
+    return <i className="phys-planet" style={{ '--c': preset.dot }} aria-hidden="true" />;
+}
 
 // Russian number format: comma as the decimal separator
 function fmt(x, d = 2) {
@@ -35,7 +43,7 @@ function GravityPanel({ presetId, g, drag, onPreset, onG, onDrag }) {
                         className={`btn phys-preset${presetId === p.id ? ' active' : ''}`}
                         onClick={() => onPreset(p)}
                     >
-                        <span className="phys-preset-icon" aria-hidden="true">{p.icon}</span>
+                        <span className="phys-preset-icon"><PresetIcon preset={p} /></span>
                         <span className="phys-preset-name">{p.name}</span>
                         <span className="phys-preset-g">{fmt(p.g, 1)} м/с²</span>
                     </button>
@@ -55,7 +63,7 @@ function GravityPanel({ presetId, g, drag, onPreset, onG, onDrag }) {
                 />
             </label>
             <button className={`btn phys-toggle${drag ? ' on' : ''}`} aria-pressed={drag} onClick={onDrag}>
-                <span>💨 Сопротивление воздуха</span>
+                <span><Wind className="ico" aria-hidden="true" /> Сопротивление воздуха</span>
                 <span className="phys-switch" aria-hidden="true"><span /></span>
             </button>
         </div>
@@ -65,7 +73,7 @@ function GravityPanel({ presetId, g, drag, onPreset, onG, onDrag }) {
 function InfoPanel({ preset, g }) {
     return (
         <div className="panel phys-info">
-            <h3>{preset ? `${preset.icon} ${preset.name}` : '🎚️ Своё значение g'}</h3>
+            <h3><PresetIcon preset={preset} /> {preset ? preset.name : 'Своё значение g'}</h3>
             <p>{preset ? preset.text : ratioText(g)}</p>
         </div>
     );
@@ -109,7 +117,7 @@ function MeasureBar({ readout, selected }) {
             <div className="phys-legend">
                 <span><i className="phys-dot" /> 0,1 с</span>
                 <span><i className="phys-arrow" /> скорость</span>
-                <span>✊ Возьмите предмет рукой или мышью — и бросьте</span>
+                <span><Hand className="ico" aria-hidden="true" /> Возьмите предмет рукой или мышью — и бросьте</span>
                 <span>Размеры предметов увеличены; массы и воздух — настоящие</span>
             </div>
         </div>
@@ -152,14 +160,14 @@ function GalileoPanel({ gal, g, rho, drag, onStart, onRepeat }) {
             <div className="panel-title">Опыт Галилея</div>
             <p className="phys-text">Перо и шар отпускают одновременно с высоты {GALILEO_HEIGHT} м.</p>
             <button className="btn btn-primary phys-big" onClick={onStart} disabled={gal?.phase === 'hold'}>
-                🪶 Перо и шар
+                <Feather /> Перо и шар
             </button>
             <p className="phys-note">
                 Сейчас: {!canToggleAir ? 'воздуха нет' : drag ? 'в воздухе' : 'без воздуха (как в вакууме)'}
             </p>
             {done && canToggleAir && gal.g > 0.01 && (
                 <button className="btn phys-wide" onClick={onRepeat}>
-                    {gal.air ? '🔁 Повторить без воздуха' : '🔁 Повторить в воздухе'}
+                    <Repeat /> {gal.air ? 'Повторить без воздуха' : 'Повторить в воздухе'}
                 </button>
             )}
         </div>
@@ -172,12 +180,12 @@ function GalileoResult({ gal, g, rho, drag, onClose }) {
     return (
         <div className="panel phys-result">
             <div className="phys-info-head">
-                <h3>🪶 Опыт Галилея: что упадёт первым?</h3>
+                <h3><Feather className="ico" aria-hidden="true" /> Опыт Галилея: что упадёт первым?</h3>
                 <button className="btn btn-small" onClick={onClose}>Скрыть</button>
             </div>
             <div className="phys-bars">
-                <TimeBar label="🎳 Шар (7 кг)" t={gal.tBall} max={max} color="var(--phys)" falling={falling} />
-                <TimeBar label="🪶 Перо (0,5 г)" t={gal.tFeather} max={max} color="#7dd3fc" falling={falling} />
+                <TimeBar label="Шар (7 кг)" t={gal.tBall} max={max} color="var(--phys)" falling={falling} />
+                <TimeBar label="Перо (0,5 г)" t={gal.tFeather} max={max} color="#7dd3fc" falling={falling} />
             </div>
             {theory && <p className="phys-foot">Расчёт без воздуха: t = √(2h/g) = {fmt(theory)} с</p>}
             {conclusion && <p className="phys-conclusion">{conclusion}</p>}
@@ -235,16 +243,14 @@ export default function PhysicsLab({ onBack }) {
     return (
         <LabShell
             title="Физика"
-            subtitle="Сила тяжести и движение тел"
-            icon="🍎"
-            accent="var(--phys)"
+            subtitle="Сила тяжести и движение тел" subject="physics"
             onBack={onBack}
             actions={(
                 <>
                     <button className={`btn${slow ? ' active' : ''}`} onClick={() => setSlow((s) => !s)}>
-                        🐢 Замедление ×0,25
+                        <Snail /> Замедление ×0,25
                     </button>
-                    <button className="btn" onClick={reset}>↺ Заново</button>
+                    <button className="btn" onClick={reset}><RotateCcw /> Заново</button>
                 </>
             )}
         >

@@ -1,5 +1,6 @@
 // Right-hand panels: info card for the selected body, intro and the "real scale" explainer.
 import React from 'react';
+import { ArrowLeft, Lightbulb, Moon, X } from 'lucide-react';
 import { ballScale, formatKm, formatMkm } from './bodies';
 
 // One fact as a compact tile; the card shows them in two columns so it fits a 768 px tall projector screen
@@ -29,7 +30,7 @@ export function InfoCard({ body, onClose, onSelect }) {
                     <h2>{body.name}</h2>
                     <div className="cosmos-card-type">{body.type}</div>
                 </div>
-                <button className="btn btn-icon btn-ghost cosmos-card-close" onClick={onClose} aria-label="Закрыть">✕</button>
+                <button className="btn btn-icon btn-ghost cosmos-card-close" onClick={onClose} aria-label="Закрыть"><X /></button>
             </div>
 
             <div className="cosmos-stats">
@@ -45,13 +46,13 @@ export function InfoCard({ body, onClose, onSelect }) {
                 {body.kind !== 'star' && <Stat wide label="Если Солнце — мяч 30 см" value={ballScale(body)} />}
             </div>
 
-            <p className="cosmos-fact"><span aria-hidden="true">💡 </span>{body.fact}</p>
+            <p className="cosmos-fact"><Lightbulb className="ico" aria-hidden="true" /> {body.fact}</p>
 
             {body.id === 'earth' && (
-                <button className="btn cosmos-card-link" onClick={() => onSelect('moon')}>🌙 Луна — спутник Земли</button>
+                <button className="btn cosmos-card-link" onClick={() => onSelect('moon')}><Moon /> Луна — спутник Земли</button>
             )}
             {body.id === 'moon' && (
-                <button className="btn cosmos-card-link" onClick={() => onSelect('earth')}>← Вернуться к Земле</button>
+                <button className="btn cosmos-card-link" onClick={() => onSelect('earth')}><ArrowLeft /> Вернуться к Земле</button>
             )}
         </div>
     );

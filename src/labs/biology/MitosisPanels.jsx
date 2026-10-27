@@ -1,5 +1,6 @@
 // Panels of the mitosis view: phase list (left), phase card (right) and the playback bar (bottom).
 import React from 'react';
+import { Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 import { MITOSIS_INFO, PHASES, PHASE_COUNT } from './mitosis';
 
 export function PhaseList({ phase, onPick }) {
@@ -54,9 +55,9 @@ export function MitosisBar({ t, playing, onPlay, onStep, onScrub, labels, onLabe
     const fill = `${(t / PHASE_COUNT) * 100}%`;
     return (
         <>
-            <button className="btn btn-icon" onClick={() => onStep(-1)} aria-label="Предыдущая фаза">⏮</button>
-            <button className="btn btn-primary bio-play" onClick={onPlay}>{playing ? '⏸ Пауза' : '▶ Смотреть'}</button>
-            <button className="btn btn-icon" onClick={() => onStep(1)} aria-label="Следующая фаза">⏭</button>
+            <button className="btn btn-icon" onClick={() => onStep(-1)} aria-label="Предыдущая фаза"><SkipBack /></button>
+            <button className="btn btn-primary bio-play" onClick={onPlay}>{playing ? <><Pause /> Пауза</> : <><Play /> Смотреть</>}</button>
+            <button className="btn btn-icon" onClick={() => onStep(1)} aria-label="Следующая фаза"><SkipForward /></button>
             <input className="bio-time" type="range" min="0" max={PHASE_COUNT - 0.01} step="0.01" value={t}
                 style={{ '--fill': fill }} onChange={e => onScrub(parseFloat(e.target.value))} aria-label="Ход деления" />
             <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={onLabels}>Подписи</button>

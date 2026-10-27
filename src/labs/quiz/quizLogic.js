@@ -4,8 +4,8 @@ import { QUESTIONS, TOPICS, MIXED } from './questions.js';
 export const LETTERS = ['А', 'Б', 'В', 'Г'];
 export const TIMER_SECONDS = 20;
 export const TEAMS = [
-    { id: 'red', label: 'Красные', icon: '🔴', color: '#f87171' },
-    { id: 'blue', label: 'Синие', icon: '🔵', color: '#60a5fa' },
+    { id: 'red', label: 'Красные', color: '#f87171' },
+    { id: 'blue', label: 'Синие', color: '#60a5fa' },
 ];
 
 export const topicById = (id) => TOPICS.find(t => t.id === id) || MIXED;
@@ -61,9 +61,9 @@ export function buildRound(topicId, count) {
 
 export function resultTitle(correct, total) {
     const pct = total ? correct / total : 0;
-    if (pct === 1) return { emoji: '🧠', title: 'Гении науки!', note: 'Ни одной ошибки — блестяще!' };
-    if (pct >= 0.8) return { emoji: '🏆', title: 'Настоящие знатоки!', note: 'Почти идеально.' };
-    if (pct >= 0.6) return { emoji: '🚀', title: 'Отличный полёт!', note: 'Хороший результат, так держать.' };
-    if (pct >= 0.4) return { emoji: '🔭', title: 'Юные исследователи', note: 'Неплохо! Есть что повторить.' };
-    return { emoji: '🧪', title: 'Опыты продолжаются!', note: 'Загляните в лаборатории и попробуйте ещё раз.' };
+    if (pct === 1) return { icon: 'brain', title: 'Гении науки!', note: 'Ни одной ошибки — блестяще!' };
+    if (pct >= 0.8) return { icon: 'trophy', title: 'Настоящие знатоки!', note: 'Почти идеально.' };
+    if (pct >= 0.6) return { icon: 'rocket', title: 'Отличный полёт!', note: 'Хороший результат, так держать.' };
+    if (pct >= 0.4) return { icon: 'telescope', title: 'Юные исследователи', note: 'Неплохо! Есть что повторить.' };
+    return { icon: 'flask', title: 'Опыты продолжаются!', note: 'Загляните в лаборатории и попробуйте ещё раз.' };
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Bot, BotMessageSquare, Mic, SendHorizontal, Volume2, X } from 'lucide-react';
 import './AIChatbot.css';
 
 // Requests go through the Vite dev-server proxy (vite.config.js), which adds the xkiro key server-side
@@ -55,7 +56,7 @@ function speak(text) {
 export const AIChatbot = ({ mode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { text: 'Привет! Я EduBot — помощник на уроке. Нажмите на готовый вопрос, скажите его голосом 🎤 или напишите.', sender: 'bot' }
+        { text: 'Привет! Я EduBot — помощник на уроке. Нажмите на готовый вопрос, скажите его голосом или напишите.', sender: 'bot' }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -152,7 +153,7 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
         <div className={`ai-chatbot ${isOpen ? 'open' : ''}`}>
             {!isOpen && (
                 <button className="ai-fab" onClick={() => setIsOpen(true)} aria-label="Открыть EduBot">
-                    <span className="ai-fab-icon">🤖</span>
+                    <BotMessageSquare className="ai-fab-icon" aria-hidden="true" />
                     <span className="ai-fab-text">Спросить</span>
                 </button>
             )}
@@ -160,15 +161,15 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
             {isOpen && (
                 <div className="ai-window panel">
                     <header className="ai-header">
-                        <div className="ai-avatar">🤖</div>
+                        <div className="ai-avatar"><Bot aria-hidden="true" /></div>
                         <div className="ai-header-text">
                             <h3>EduBot</h3>
                             <span>Раздел: {MODE_NAMES[mode] || mode}</span>
                         </div>
                         <button className={`btn btn-icon btn-small ${readAloud ? 'active' : ''}`}
                             onClick={() => { setReadAloud(r => !r); window.speechSynthesis?.cancel(); }}
-                            title="Читать ответы вслух" aria-label="Читать ответы вслух">🔊</button>
-                        <button className="btn btn-icon btn-small" onClick={() => setIsOpen(false)} aria-label="Закрыть">✕</button>
+                            title="Читать ответы вслух" aria-label="Читать ответы вслух"><Volume2 /></button>
+                        <button className="btn btn-icon btn-small" onClick={() => setIsOpen(false)} aria-label="Закрыть"><X /></button>
                     </header>
 
                     <div className="ai-messages">
@@ -194,7 +195,7 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
                     <form className="ai-input-area" onSubmit={(e) => { e.preventDefault(); ask(input); }}>
                         {SpeechRecognition && (
                             <button type="button" className={`btn btn-icon ${listening ? 'listening' : ''}`} onClick={toggleListening}
-                                aria-label={listening ? 'Остановить запись' : 'Спросить голосом'} title="Спросить голосом">🎤</button>
+                                aria-label={listening ? 'Остановить запись' : 'Спросить голосом'} title="Спросить голосом"><Mic /></button>
                         )}
                         <input
                             type="text"
@@ -203,7 +204,7 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
                             onChange={(e) => setInput(e.target.value)}
                             disabled={isLoading}
                         />
-                        <button type="submit" className="btn btn-primary" disabled={isLoading || !input.trim()}>➤</button>
+                        <button type="submit" className="btn btn-primary" disabled={isLoading || !input.trim()} aria-label="Отправить"><SendHorizontal /></button>
                     </form>
                 </div>
             )}

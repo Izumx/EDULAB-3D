@@ -1,5 +1,6 @@
 // Biology lab: cut-away animal and plant cells, the DNA double helix and mitosis (hand + mouse control).
 import React, { Suspense, lazy, useCallback, useRef, useState } from 'react';
+import { Hand, MousePointer2, X } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
 import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
@@ -8,6 +9,7 @@ import {
 } from './content';
 import { MitosisBar, PhaseCard, PhaseList } from './MitosisPanels';
 import { PHASE_COUNT } from './mitosis';
+import { initialLabMode, rememberLabMode } from '../../ui/labMode';
 import './biology.css';
 
 const CellScene = lazy(() => import('./CellScene'));
@@ -67,7 +69,7 @@ function PartCard({ part, onClose }) {
                     <h2>{part.name}</h2>
                     <div className="bio-card-kind">{part.kind}</div>
                 </div>
-                <button className="btn btn-icon bio-card-close" onClick={onClose} aria-label="Закрыть">✕</button>
+                <button className="btn btn-icon bio-card-close" onClick={onClose} aria-label="Закрыть"><X /></button>
             </div>
             <div className="bio-card-label">Функция</div>
             <p>{part.func}</p>
@@ -91,18 +93,19 @@ function IntroCard({ view, unzip, handPresent }) {
                 {items.map(t => <li key={t}>{t}</li>)}
             </ul>
             <p className="bio-hint">
+                {handPresent ? <Hand className="ico" aria-hidden="true" /> : <MousePointer2 className="ico" aria-hidden="true" />}{' '}
                 {handPresent
-                    ? '✊ Сожмите кулак в пустом месте и двигайте рукой — модель вращается. Задержите курсор на части — она выберется.'
-                    : '🖱 Тяните мышью — вращение, колесо — масштаб. Нажмите на часть модели или выберите её в списке.'}
+                    ? 'Сожмите кулак в пустом месте и двигайте рукой — модель вращается. Задержите курсор на части — она выберется.'
+                    : 'Тяните мышью — вращение, колесо — масштаб. Нажмите на часть модели или выберите её в списке.'}
             </p>
         </div>
     );
 }
 
 export default function BiologyLab({ onBack }) {
-    const [view, setView] = useState('animal');
+    const [view, setView] = useState(() => initialLabMode('animal', VIEWS.map(v => v.id)));
     const [selected, setSelected] = useState(null);
-    const [labels, setLabels] = useState(true);
+    const [labels, setLabels] = useState(() => view !== 'plant');
     const [unzip, setUnzip] = useState(false);
     const [nonce, setNonce] = useState(0);
     const [mitoT, setMitoT] = useState(HOLD);
@@ -131,6 +134,7 @@ export default function BiologyLab({ onBack }) {
 
     const changeView = id => {
         setView(id);
+        rememberLabMode(id);
         setLabels(id !== 'plant'); // the plant cell has many parts, so its names start hidden
         setSelected(null);
         setUnzip(false);
@@ -161,7 +165,7 @@ export default function BiologyLab({ onBack }) {
     );
 
     return (
-        <LabShell title="Биология" subtitle={dna ? 'Молекула ДНК' : mitosis ? 'Митоз' : 'Строение клетки'} icon="🧬" accent="var(--bio)" onBack={onBack} actions={tabs}>
+        <LabShell title="Биология" subtitle={dna ? 'Молекула ДНК' : mitosis ? 'Митоз' : 'Строение клетки'} subject="biology" onBack={onBack} actions={tabs}>
             <LabCanvas camera={CAMERA} onCreated={onCreated}>
                 <Suspense fallback={null}>
                     {mitosis

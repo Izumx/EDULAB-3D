@@ -1,12 +1,18 @@
 // «Глобус» mode: read coordinates, meet the main lines and cities, then find points by their coordinates.
 import React, { useRef, useState } from 'react';
+import { ArrowRight, Star, Target } from 'lucide-react';
 import { LabCanvas } from '../../ui/three';
 import GlobeScene from './GlobeScene';
 import { CITIES, CITY_BY_ID, LINES, distanceKm, latInt, latText, lonInt, lonText, starsFor } from './geo';
 
 const CAMERA = { position: [0, 0, 4.3], fov: 40, near: 0.1, far: 100 };
 const SHORT = { equator: 'Экватор', tropicN: 'Тропик Рака', tropicS: 'Тропик Козерога', polarN: 'Полярный круг С', polarS: 'Полярный круг Ю', prime: 'Гринвич 0°', dateline: 'Меридиан 180°' };
-const STARS = n => '★'.repeat(n) + '☆'.repeat(3 - n);
+// n of 3 stars, filled ones in gold
+const STARS = n => (
+    <span className="geo-stars" aria-label={`${n} из 3`}>
+        {[0, 1, 2].map(i => <Star key={i} className={`ico${i < n ? ' on' : ''}`} aria-hidden="true" />)}
+    </span>
+);
 
 export default function GlobeMode() {
     const [selected, setSelected] = useState(null);
@@ -111,14 +117,14 @@ export default function GlobeMode() {
 
                 {task ? (
                     <div className="panel geo-card geo-task">
-                        <div className="panel-title">🎯 Найдите точку · {STARS(Math.min(3, Math.round(score.rounds ? score.stars / score.rounds : 0)))} {score.rounds ? `(${score.rounds})` : ''}</div>
+                        <div className="panel-title"><Target className="ico" aria-hidden="true" />Найдите точку · {STARS(Math.min(3, Math.round(score.rounds ? score.stars / score.rounds : 0)))} {score.rounds ? `(${score.rounds})` : ''}</div>
                         <div className="geo-coords">{latInt(task.target.lat)}<br />{lonInt(task.target.lon)}</div>
                         {!task.answer ? (
                             <p className="geo-muted">Нажмите на глобус там, где, по-вашему, находится эта точка. Мышью или рукой.</p>
                         ) : (
                             <>
                                 <p className="geo-result">
-                                    <b>{task.target.name}</b> — вы промахнулись на <b>{Math.round(task.answer.km).toLocaleString('ru-RU')} км</b>. <span className="geo-stars">{STARS(task.answer.stars)}</span>
+                                    <b>{task.target.name}</b> — вы промахнулись на <b>{Math.round(task.answer.km).toLocaleString('ru-RU')} км</b>. {STARS(task.answer.stars)}
                                 </p>
                                 <p className="geo-muted geo-info">{task.target.info}</p>
                             </>
@@ -147,13 +153,13 @@ export default function GlobeMode() {
             <nav className="lab-bottom geo-bar" aria-label="Действия">
                 <button className="btn btn-icon geo-zoom" onClick={() => { zoom.current = Math.min(1.5, zoom.current * 1.18); }} aria-label="Отдалить">−</button>
                 <button className="btn btn-icon geo-zoom" onClick={() => { zoom.current = Math.max(0.55, zoom.current * 0.85); }} aria-label="Приблизить">+</button>
-                {!task && <button className="btn btn-primary" onClick={newTask}>🎯 Найди точку</button>}
+                {!task && <button className="btn btn-primary" onClick={newTask}><Target /> Найди точку</button>}
                 {task && !task.answer && task.hints < 2 && (
                     <button className="btn" onClick={() => setTask(t => ({ ...t, hints: t.hints + 1 }))}>
                         Подсказка: {task.hints === 0 ? 'параллель' : 'меридиан'}
                     </button>
                 )}
-                {task?.answer && <button className="btn btn-primary" onClick={newTask}>Следующая точка →</button>}
+                {task?.answer && <button className="btn btn-primary" onClick={newTask}>Следующая точка <ArrowRight /></button>}
                 {task && <button className="btn btn-ghost" onClick={endTask}>Завершить</button>}
             </nav>
         </>

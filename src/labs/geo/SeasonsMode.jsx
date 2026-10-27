@@ -1,5 +1,6 @@
 // «Времена года»: the day/night line for any date and hour, the length of the day at a chosen place, and the orbit diagram.
 import React, { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Leaf, Moon, Pause, Play, Snowflake, Sprout, Sun } from 'lucide-react';
 import { LabCanvas } from '../../ui/three';
 import SeasonScene from './SeasonScene';
 import {
@@ -7,7 +8,12 @@ import {
 } from './geo';
 
 const CAMERA = { position: [0, 0, 4.3], fov: 40, near: 0.1, far: 100 };
-const SEASON_ICON = { весна: '🌱', лето: '☀️', осень: '🍂', зима: '❄️' };
+const SEASON_ICON = {
+    весна: <Sprout className="ico" style={{ color: '#4ade80' }} aria-hidden="true" />,
+    лето: <Sun className="ico" style={{ color: '#fbbf24' }} aria-hidden="true" />,
+    осень: <Leaf className="ico" style={{ color: '#fb923c' }} aria-hidden="true" />,
+    зима: <Snowflake className="ico" style={{ color: '#7dd3fc' }} aria-hidden="true" />,
+};
 
 // Orbit seen from above (not to scale): Earth at the angle of the chosen date, its axis always tilted the same way
 function OrbitDiagram({ n }) {
@@ -108,7 +114,7 @@ export default function SeasonsMode() {
                     <div className="panel-title">Время (по Гринвичу): {clockText(utc)}</div>
                     <input className="geo-range" type="range" min="0" max="24" step="0.1" value={utc} aria-label="Время"
                         style={{ '--fill': `${(utc / 24) * 100}%` }} onChange={e => { setPlaying(false); setUtc(parseFloat(e.target.value)); }} />
-                    <button className={`btn geo-play${playing ? ' active' : ''}`} onClick={() => setPlaying(p => !p)}>{playing ? '⏸ Пауза' : '▶ Сутки'}</button>
+                    <button className={`btn geo-play${playing ? ' active' : ''}`} onClick={() => setPlaying(p => !p)}>{playing ? <><Pause /> Пауза</> : <><Play /> Сутки</>}</button>
                 </div>
             </aside>
 
@@ -118,18 +124,18 @@ export default function SeasonsMode() {
                 </div>
                 <div className="panel geo-card">
                     <div className="geo-stepper">
-                        <button className="btn btn-icon" onClick={() => step(-1)} aria-label="Предыдущее место">◀</button>
+                        <button className="btn btn-icon" onClick={() => step(-1)} aria-label="Предыдущее место"><ChevronLeft /></button>
                         <div className="geo-stepper-name">
                             <b>{place.name}</b>
                             <small>{latText(place.lat)} · {lonText(place.lon)}</small>
                         </div>
-                        <button className="btn btn-icon" onClick={() => step(1)} aria-label="Следующее место">▶</button>
+                        <button className="btn btn-icon" onClick={() => step(1)} aria-label="Следующее место"><ChevronRight /></button>
                     </div>
                     <div className="geo-facts" role="status">
                         <div className="geo-fact"><span>Сейчас здесь</span><b>{SEASON_ICON[seasonHere]} {seasonHere}</b></div>
                         <div className="geo-fact"><span>Длина дня</span><b>{hoursText(len)}</b></div>
                         <div className="geo-fact"><span>Солнце в полдень</span><b>{len === 0 ? 'не встаёт' : `${noon.toFixed(0)}° над горизонтом`}</b></div>
-                        <div className="geo-fact"><span>Солнечное время</span><b>{clockText(local)} {day ? '☀️' : '🌙'}</b></div>
+                        <div className="geo-fact"><span>Солнечное время</span><b>{clockText(local)} {day ? <Sun className="ico" style={{ color: '#fbbf24' }} aria-label="день" /> : <Moon className="ico" style={{ color: '#c4b5fd' }} aria-label="ночь" />}</b></div>
                         <div className="geo-fact"><span>Солнце в зените на</span><b>{latText(decl)}</b></div>
                     </div>
                 </div>

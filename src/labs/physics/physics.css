@@ -43,8 +43,20 @@
 
 .phys-preset-icon {
     grid-row: span 2;
+    display: grid;
+    place-items: center;
     font-size: 1.35rem;
     line-height: 1;
+}
+
+.phys-planet {
+    display: inline-block;
+    width: 1.05em;
+    height: 1.05em;
+    border-radius: 50%;
+    vertical-align: -0.15em;
+    background: radial-gradient(circle at 32% 30%, color-mix(in srgb, var(--c) 35%, #fff), var(--c) 55%, color-mix(in srgb, var(--c) 55%, #000));
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
 }
 
 .phys-preset-name {
@@ -207,6 +219,9 @@
 }
 
 .phys-info h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
     font-size: 1.05rem;
     margin-bottom: 0.5rem;
     color: var(--accent);
