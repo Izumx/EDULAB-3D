@@ -1,0 +1,363 @@
+/* Geography lab */
+.lab:has(.geo-bar) {
+    background: radial-gradient(ellipse at 50% 45%, #1b1426 0%, #0c0914 60%, #05040a 100%);
+}
+
+.geo-seg {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.3rem;
+    border-radius: calc(var(--radius-sm) + 0.3rem);
+    background: rgba(7, 11, 22, 0.7);
+    border: 1px solid var(--border);
+}
+
+.geo-seg .btn {
+    min-height: 2.8rem;
+    background: transparent;
+    border-color: transparent;
+}
+
+.geo-seg .btn.active {
+    background: var(--accent);
+    color: #1c0d02;
+}
+
+.geo-left {
+    width: min(21rem, 29vw);
+}
+
+.geo-right {
+    width: min(24rem, 32vw);
+}
+
+.geo-panel {
+    padding: 0.85rem 0.9rem 0.9rem;
+}
+
+.geo-muted {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+.geo-muted + .geo-muted {
+    margin-top: 0.5rem;
+}
+
+/* ---------- cities ---------- */
+.geo-cities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+}
+
+.btn.geo-city {
+    min-height: 2.5rem;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.92rem;
+    line-height: 1.1;
+}
+
+/* ---------- lines ---------- */
+.geo-lines {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+}
+
+.btn.geo-line {
+    justify-content: flex-start;
+    gap: 0.45rem;
+    min-height: 2.4rem;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.1;
+    text-align: left;
+}
+
+.btn.geo-line i {
+    flex: none;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+    background: var(--c);
+    opacity: 0.35;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 60%, transparent);
+}
+
+.btn.geo-line.active i {
+    opacity: 1;
+    box-shadow: 0 0 10px var(--c);
+}
+
+.btn.geo-line.active {
+    background: color-mix(in srgb, var(--c) 18%, var(--surface-strong));
+    border-color: var(--c);
+    color: var(--text);
+}
+
+.geo-line-text {
+    margin-top: 0.55rem;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+.geo-line-text b {
+    color: var(--text);
+}
+
+/* ---------- cards ---------- */
+.geo-card {
+    padding: 0.9rem 1.05rem 1rem;
+    animation: geo-in 0.3s ease-out;
+}
+
+@keyframes geo-in {
+    from { opacity: 0; transform: translateX(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+.geo-card h2 {
+    font-size: 1.3rem;
+}
+
+.geo-coords {
+    margin: 0.4rem 0 0.5rem;
+    font: 600 1.5rem/1.3 var(--font-display);
+    color: var(--accent);
+}
+
+.geo-coords.small {
+    font-size: 1.1rem;
+}
+
+.geo-result {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.geo-stars {
+    color: #fbbf24;
+    letter-spacing: 0.1em;
+}
+
+/* coordinates under the pointer */
+.geo-hud {
+    position: absolute;
+    left: 50%;
+    bottom: 5.4rem;
+    transform: translateX(-50%);
+    z-index: 9;
+    padding: 0.35rem 1.1rem;
+    border-radius: 999px;
+    background: rgba(7, 11, 22, 0.8);
+    border: 1px solid var(--border-strong);
+    font: 600 1.05rem var(--font-body);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.geo-hud.empty {
+    visibility: hidden;
+}
+
+.geo-bar {
+    width: max-content;
+    max-width: calc(100% - 26rem);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.geo-zoom {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+/* ---------- seasons ---------- */
+.geo-dates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+    margin-bottom: 0.3rem;
+}
+
+.btn.geo-date {
+    flex-direction: column;
+    gap: 0.05rem;
+    min-height: 3.3rem;
+    padding: 0.2rem 0.3rem;
+    line-height: 1.1;
+}
+
+.btn.geo-date small {
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.geo-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2.3rem;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.geo-range::-webkit-slider-runnable-track {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--accent) var(--fill), rgba(255, 255, 255, 0.16) var(--fill));
+}
+
+.geo-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-top: -0.58rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--accent);
+}
+
+.geo-range::-moz-range-track {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.geo-range::-moz-range-progress {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: var(--accent);
+}
+
+.geo-range::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--accent);
+}
+
+.geo-play {
+    width: 100%;
+    margin-top: 0.3rem;
+}
+
+.geo-orbit {
+    display: block;
+    width: min(100%, 17rem);
+    margin: 0 auto;
+}
+
+.geo-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.geo-stepper .btn-icon {
+    flex: none;
+    width: 2.9rem;
+    min-height: 2.9rem;
+    font-size: 1.1rem;
+}
+
+.geo-stepper-name {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.geo-stepper-name b {
+    font: 600 1.1rem var(--font-display);
+}
+
+.geo-stepper-name small {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.geo-facts {
+    display: grid;
+    gap: 0.05rem;
+    margin-top: 0.6rem;
+}
+
+.geo-fact {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.3rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.92rem;
+}
+
+.geo-fact span {
+    color: var(--text-muted);
+}
+
+.geo-fact b {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.geo-info {
+    font-size: 0.9rem !important;
+}
+
+/* short projector screens: tighter panels so nothing needs scrolling (a hand cannot scroll) */
+@media (max-height: 800px) {
+    .geo-panel {
+        padding: 0.7rem 0.8rem 0.75rem;
+    }
+
+    .btn.geo-line {
+        min-height: 2.2rem;
+    }
+
+    .geo-line-text {
+        margin-top: 0.4rem;
+        font-size: 0.82rem;
+        line-height: 1.3;
+    }
+
+    .geo-card {
+        padding: 0.75rem 0.9rem 0.85rem;
+    }
+
+    .geo-fact {
+        padding: 0.2rem 0;
+    }
+
+    .geo-orbit {
+        width: min(100%, 14rem);
+    }
+
+    .btn.geo-date {
+        min-height: 3rem;
+    }
+}
+
+@media (max-height: 740px) {
+    .geo-extra {
+        display: none;
+    }
+
+    .geo-orbit {
+        width: min(100%, 11.5rem);
+    }
+
+    .geo-coords {
+        font-size: 1.25rem;
+        margin: 0.2rem 0 0.3rem;
+    }
+}

@@ -10,6 +10,8 @@ const LABS = {
     biology: lazy(() => import('./labs/biology/BiologyLab.jsx')),
     physics: lazy(() => import('./labs/physics/PhysicsLab.jsx')),
     cosmos: lazy(() => import('./labs/cosmos/CosmosLab.jsx')),
+    math: lazy(() => import('./labs/math/MathLab.jsx')),
+    geo: lazy(() => import('./labs/geo/GeoLab.jsx')),
     quiz: lazy(() => import('./labs/quiz/QuizLab.jsx')),
 };
 
