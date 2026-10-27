@@ -166,7 +166,7 @@ export function lerpScale(visual, real, k) {
 }
 
 export const SPEEDS = [
-    { id: 'pause', label: 'Пауза', icon: '⏸', days: 0 },
+    { id: 'pause', label: 'Пауза', days: 0 },
     { id: 'x1', label: '×1', days: 2 },
     { id: 'x10', label: '×10', days: 20 },
     { id: 'x100', label: '×100', days: 200 },

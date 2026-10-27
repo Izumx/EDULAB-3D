@@ -77,7 +77,7 @@ export function makeWallTexture() {
     // ruler: ticks every 10 cm, labels every metre
     ctx.strokeStyle = 'rgba(251,191,36,0.85)';
     ctx.fillStyle = 'rgba(251,191,36,0.95)';
-    ctx.font = '600 44px Inter, "Segoe UI", system-ui, sans-serif';
+    ctx.font = '800 44px Nunito, "Segoe UI", system-ui, sans-serif';
     ctx.textBaseline = 'middle';
     for (let k = 1; k < ROOM.h * 10; k++) {
         const y = H - k * ppm / 10;

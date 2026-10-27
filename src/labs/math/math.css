@@ -402,3 +402,6 @@
     border-color: var(--success);
     box-shadow: 0 0 30px color-mix(in srgb, var(--success) 35%, transparent);
 }
+
+.views-ok { color: var(--success); margin-left: 0.2em; }
+.views-bad { color: var(--danger); margin-left: 0.2em; }

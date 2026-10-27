@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowLeft, TriangleAlert } from 'lucide-react';
 
 export class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -19,13 +20,13 @@ export class ErrorBoundary extends React.Component {
             return (
                 <div className="loading-screen">
                     <div className="panel" style={{ maxWidth: '36rem', textAlign: 'center', display: 'grid', gap: '1rem' }}>
-                        <h2>⚠️ Что-то пошло не так</h2>
+                        <h2><TriangleAlert className="ico" style={{ color: 'var(--warning, #fbbf24)' }} aria-hidden="true" /> Что-то пошло не так</h2>
                         <p className="muted">Эта лаборатория столкнулась с ошибкой. Можно вернуться в меню и продолжить урок.</p>
                         <pre style={{ color: 'var(--danger)', whiteSpace: 'pre-wrap', fontSize: '0.8rem', margin: 0 }}>
                             {this.state.error && this.state.error.toString()}
                         </pre>
                         {this.props.onReset
-                            ? <button className="btn btn-primary" onClick={this.props.onReset}>← В меню</button>
+                            ? <button className="btn btn-primary" onClick={this.props.onReset}><ArrowLeft /> В меню</button>
                             : <button className="btn btn-primary" onClick={() => window.location.reload()}>Перезагрузить</button>}
                     </div>
                 </div>

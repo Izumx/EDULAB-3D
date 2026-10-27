@@ -560,3 +560,6 @@
 .rx-arrow {
     margin: 0 0.3rem;
 }
+
+.rx-ok { color: var(--success); }
+.rx-bad { color: var(--danger); }

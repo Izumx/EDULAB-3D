@@ -4,6 +4,7 @@
 //   - Grab on a slider and move -> drags the slider.
 //   - 3D objects registered with <HandPointer/> (userData.handTarget) behave like buttons too.
 import React, { useEffect, useRef } from 'react';
+import { LoaderCircle, TriangleAlert } from 'lucide-react';
 import { hand, onHand, useHandStatus, emitHand } from './handStore';
 import { startTracker, stopTracker, getVideoStream } from './tracker';
 import { useHandSettings, getHandSettings } from './settings';
@@ -179,11 +180,11 @@ function CameraPreview() {
                 </div>
             )}
             <div className="camera-preview-status">
-                {status === 'loading' && <>⏳ Запускаю камеру…</>}
+                {status === 'loading' && <><LoaderCircle className="ico ico-spin" aria-hidden="true" /> Запускаю камеру…</>}
                 {status === 'ready' && (present
                     ? <><span className="dot ok" /> Рука найдена</>
                     : <><span className="dot wait" /> Покажите ладонь камере</>)}
-                {status === 'error' && <>⚠️ {error}</>}
+                {status === 'error' && <><TriangleAlert className="ico" aria-hidden="true" /> {error}</>}
             </div>
             {status === 'error' && (
                 <button className="btn btn-small" onClick={() => startTracker()}>Повторить</button>

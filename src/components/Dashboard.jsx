@@ -1,29 +1,14 @@
 import React, { useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars } from '@react-three/drei';
+import { Atom, ChevronRight, Globe2, Grab, Hand, Lightbulb, Microscope, Pi, Ruler, Settings, Sigma, Telescope, Timer } from 'lucide-react';
 import { useHandStatus } from '../hand/handStore';
 import { useHandSettings, setHandSettings } from '../hand/settings';
 import { startTracker } from '../hand/tracker';
+import { Emblem, Logo } from '../ui/Emblem';
+import { SUBJECTS } from '../ui/subjects';
 import './Dashboard.css';
-
-const MODULES = [
-    { id: 'chemistry', title: 'Химия', icon: '🧪', desc: 'Молекулы из атомов и химические реакции', color: 'var(--chem)' },
-    { id: 'biology', title: 'Биология', icon: '🧬', desc: 'Клетка, митоз и ДНК', color: 'var(--bio)' },
-    { id: 'physics', title: 'Физика', icon: '🍎', desc: 'Гравитация и движение тел', color: 'var(--phys)' },
-    { id: 'cosmos', title: 'Космос', icon: '🪐', desc: 'Солнечная система и фазы Луны', color: 'var(--cosmos)' },
-    { id: 'math', title: 'Математика', icon: '📐', desc: 'Тела, развёртки и чертежи', color: 'var(--math)' },
-    { id: 'geo', title: 'География', icon: '🌍', desc: 'Глобус, координаты и времена года', color: 'var(--geo)' },
-    { id: 'quiz', title: 'Викторина', icon: '🏆', desc: 'Проверка знаний всем классом', color: 'var(--quiz)' },
-];
 
 const SENSITIVITY = [['low', 'Низкая'], ['medium', 'Средняя'], ['high', 'Высокая']];
 const DWELL = [[0, 'Выкл'], [700, '0,7 с'], [1000, '1 с'], [1500, '1,5 с']];
-
-function SlowStars() {
-    const ref = React.useRef();
-    useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.01; });
-    return <group ref={ref}><Stars radius={80} depth={60} count={4000} factor={4} fade speed={0.6} /></group>;
-}
 
 function CameraControl() {
     const settings = useHandSettings();
@@ -44,9 +29,9 @@ function CameraControl() {
             {settings.cameraEnabled ? (
                 <button className="btn" onClick={() => setHandSettings({ cameraEnabled: false })}>Выключить камеру</button>
             ) : (
-                <button className="btn btn-primary" onClick={() => setHandSettings({ cameraEnabled: true })}>✋ Включить управление руками</button>
+                <button className="btn btn-primary" onClick={() => setHandSettings({ cameraEnabled: true })}><Hand aria-hidden="true" />Включить управление руками</button>
             )}
-            <button className={`btn btn-icon ${open ? 'active' : ''}`} onClick={() => setOpen(o => !o)} title="Настройки" aria-label="Настройки">⚙️</button>
+            <button className={`btn btn-icon ${open ? 'active' : ''}`} onClick={() => setOpen(o => !o)} title="Настройки" aria-label="Настройки"><Settings aria-hidden="true" /></button>
 
             {open && (
                 <div className="settings-panel panel">
@@ -86,40 +71,84 @@ function CameraControl() {
     );
 }
 
+function greeting() {
+    const h = new Date().getHours();
+    if (h >= 5 && h < 12) return 'Доброе утро';
+    if (h >= 12 && h < 17) return 'Добрый день';
+    if (h >= 17 && h < 23) return 'Добрый вечер';
+    return 'Здравствуйте';
+}
+
+// Faint outline drawings in the background, like doodles in the margins of an exercise book
+const DOODLES = [
+    { Icon: Atom, x: '6%', y: '24%', s: 120, r: -12 },
+    { Icon: Sigma, x: '88%', y: '18%', s: 96, r: 10 },
+    { Icon: Ruler, x: '92%', y: '74%', s: 110, r: -28 },
+    { Icon: Microscope, x: '3%', y: '78%', s: 104, r: 8 },
+    { Icon: Globe2, x: '47%', y: '90%', s: 90, r: 0 },
+    { Icon: Telescope, x: '70%', y: '6%', s: 86, r: 14 },
+    { Icon: Pi, x: '30%', y: '7%', s: 80, r: -8 },
+    { Icon: Lightbulb, x: '58%', y: '48%', s: 70, r: 12 },
+];
+
+function SubjectCard({ s, onOpen }) {
+    return (
+        <article className="module-card" style={{ '--accent': s.color }}>
+            <button className="module-main" onClick={() => onOpen(s.id)}>
+                <span className="module-top">
+                    <Emblem id={s.id} size="3.1rem" />
+                    <span className="module-grade">{s.grades}</span>
+                </span>
+                <span className="module-title">{s.title}</span>
+                <span className="module-desc">{s.desc}</span>
+            </button>
+            <div className="module-modes">
+                {s.modes
+                    ? s.modes.map(m => (
+                        <button key={m.id} className="module-mode" onClick={() => onOpen(`${s.id}/${m.id}`)}>
+                            {m.label}<ChevronRight aria-hidden="true" />
+                        </button>
+                    ))
+                    : s.tags.map(t => <span key={t} className="module-tag">{t}</span>)}
+            </div>
+        </article>
+    );
+}
+
 export const Dashboard = ({ onOpen }) => (
     <div className="dashboard">
-        <div className="dashboard-bg">
-            <Canvas camera={{ position: [0, 0, 1] }} dpr={[1, 1.5]}>
-                <SlowStars />
-            </Canvas>
+        <div className="dashboard-bg" aria-hidden="true">
+            {DOODLES.map((d, i) => {
+                const Doodle = d.Icon;
+                return <Doodle key={i} className="doodle" style={{ left: d.x, top: d.y, width: d.s, height: d.s, transform: `rotate(${d.r}deg)` }} strokeWidth={1.2} />;
+            })}
         </div>
 
         <header className="dashboard-top">
             <div className="brand">
-                <img src="/favicon.svg" alt="" width="44" height="44" />
-                <span>EduLab <b>3D</b></span>
+                <Logo size={48} />
+                <div className="brand-text">
+                    <span className="brand-name">EduLab <b>3D</b></span>
+                    <span className="brand-sub">Интерактивные 3D-уроки</span>
+                </div>
             </div>
             <CameraControl />
         </header>
 
         <main className="dashboard-main">
-            <h1 className="dashboard-heading">Выберите лабораторию</h1>
-            <div className="module-grid">
-                {MODULES.map(m => (
-                    <button key={m.id} className="module-card" style={{ '--accent': m.color }} onClick={() => onOpen(m.id)}>
-                        <span className="module-icon" aria-hidden="true">{m.icon}</span>
-                        <span className="module-title">{m.title}</span>
-                        <span className="module-desc">{m.desc}</span>
-                    </button>
-                ))}
-                <div className="module-card help-card">
-                    <span className="module-title">Как управлять руками</span>
-                    <ul>
-                        <li><span>🖐️</span> Ведите ладонью — двигается курсор</li>
-                        <li><span>⏱️</span> Задержите курсор на кнопке — она нажмётся</li>
-                        <li><span>🤏</span> Щипок или <span>✊</span> кулак — схватить, вращать, нажать сразу</li>
-                    </ul>
+            <div className="dashboard-hero">
+                <div>
+                    <h1 className="dashboard-heading">{greeting()}! <span>Какой урок сегодня?</span></h1>
+                    <p>Выберите предмет — или сразу тему внутри него.</p>
                 </div>
+                <ul className="help-strip" aria-label="Управление руками">
+                    <li title="Ведите ладонью — двигается курсор"><span className="help-ico"><Hand aria-hidden="true" /></span><span><b>Ладонь</b> — курсор</span></li>
+                    <li title="Задержите курсор на кнопке — она нажмётся"><span className="help-ico"><Timer aria-hidden="true" /></span><span><b>Задержка</b> — нажать</span></li>
+                    <li title="Щипок или кулак — схватить, вращать, нажать сразу"><span className="help-ico"><Grab aria-hidden="true" /></span><span><b>Кулак</b> — схватить</span></li>
+                </ul>
+            </div>
+            <div className="module-grid">
+                {SUBJECTS.map(s => <SubjectCard key={s.id} s={s} onOpen={onOpen} />)}
             </div>
         </main>
     </div>

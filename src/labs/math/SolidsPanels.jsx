@@ -1,5 +1,6 @@
 // Panels of the «Тела» mode: solid list with size sliders (left), facts and formulas (right), fold controls (bottom).
 import React from 'react';
+import { Package, PackageOpen } from 'lucide-react';
 import { SOLIDS, describeFaces, fmt } from './solids';
 
 export function SolidList({ solid, onPick, params, onParam }) {
@@ -80,7 +81,7 @@ export function SolidBar({ poly, fold, onFold, onScrub, edges, onEdges, numbers,
             {poly ? (
                 <>
                     <button className="btn btn-primary math-fold" onClick={() => onFold(fold > 0.5 ? 0 : 1)}>
-                        {fold > 0.5 ? '📐 Развернуть' : '📦 Свернуть'}
+                        {fold > 0.5 ? <><PackageOpen /> Развернуть</> : <><Package /> Свернуть</>}
                     </button>
                     <input className="math-range" type="range" min="0" max="1" step="0.01" value={1 - fold} aria-label="Развёртка"
                         style={{ '--fill': `${(1 - fold) * 100}%` }} onChange={e => onScrub(1 - parseFloat(e.target.value))} />

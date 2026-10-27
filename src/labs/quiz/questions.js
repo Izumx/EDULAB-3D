@@ -3,15 +3,15 @@
 // Options are shuffled at runtime, so avoid "all of the above"-style answers.
 
 export const TOPICS = [
-    { id: 'chemistry', label: 'Химия', icon: '⚗️', color: '#22d3ee', hint: 'Молекулы, связи, формулы' },
-    { id: 'biology', label: 'Биология', icon: '🧬', color: '#4ade80', hint: 'Клетка и ДНК' },
-    { id: 'physics', label: 'Физика', icon: '🍎', color: '#fbbf24', hint: 'Тяготение и падение тел' },
-    { id: 'cosmos', label: 'Космос', icon: '🪐', color: '#a78bfa', hint: 'Солнце, планеты, Луна' },
-    { id: 'math', label: 'Математика', icon: '📐', color: '#60a5fa', hint: 'Тела, объёмы, развёртки' },
-    { id: 'geo', label: 'География', icon: '🌍', color: '#fb923c', hint: 'Координаты, времена года' },
+    { id: 'chemistry', label: 'Химия', color: '#22d3ee', hint: 'Молекулы, связи, формулы' },
+    { id: 'biology', label: 'Биология', color: '#4ade80', hint: 'Клетка и ДНК' },
+    { id: 'physics', label: 'Физика', color: '#fbbf24', hint: 'Тяготение и падение тел' },
+    { id: 'cosmos', label: 'Космос', color: '#a78bfa', hint: 'Солнце, планеты, Луна' },
+    { id: 'math', label: 'Математика', color: '#60a5fa', hint: 'Тела, объёмы, развёртки' },
+    { id: 'geo', label: 'География', color: '#fb923c', hint: 'Координаты, времена года' },
 ];
 
-export const MIXED = { id: 'mixed', label: 'Всё вперемешку', icon: '🎲', color: '#f472b6', hint: 'Вопросы из всех тем' };
+export const MIXED = { id: 'mixed', label: 'Всё вперемешку', color: '#f472b6', hint: 'Вопросы из всех тем' };
 
 export const QUESTIONS = {
     chemistry: [

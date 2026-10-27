@@ -1,6 +1,11 @@
 // Class quiz for the projector: the teacher picks a topic, points at answer tiles with the hand
 // (dwell or grab), the app reveals the answer with an explanation. Optional timer and two-team mode.
 import React, { useEffect, useRef, useState } from 'react';
+import {
+    Apple, ArrowLeft, ArrowRight, Atom, Brain, CircleCheck, CircleX, Crown, Dices, Dna, Flag, FlaskConical, Handshake, Lightbulb,
+    Microscope, Moon, Orbit, Rocket, RotateCcw, Sun, Telescope, TestTube, Timer, Trophy, Users, X,
+} from 'lucide-react';
+import { Emblem } from '../../ui/Emblem';
 import { LabShell } from '../../ui/LabShell';
 import Confetti from './Confetti';
 import { TOPICS, MIXED } from './questions';
@@ -13,7 +18,14 @@ const TILE_COLORS = ['#a78bfa', '#22d3ee', '#fbbf24', '#f472b6'];
 // Buttons ignore the hand for a moment after each screen change, so a hand resting where
 // the previous button was doesn't dwell-click the new one
 const LOCK_MS = 800;
-const BG_SYMBOLS = ['⚛', '🧬', '🪐', '⚗️', '🍎', '🔬', '☀️', '🌙', '💡', '🧪'];
+const BG_SYMBOLS = [Atom, Dna, Orbit, FlaskConical, Apple, Microscope, Sun, Moon, Lightbulb, TestTube];
+const RESULT_ICONS = { brain: Brain, trophy: Trophy, rocket: Rocket, telescope: Telescope, flask: FlaskConical };
+
+// Topic picture: the subject emblem, or a dice tile for the mixed round
+function TopicIcon({ id }) {
+    if (id !== MIXED.id) return <Emblem id={id} />;
+    return <span className="quiz-mixed-tile"><Dices aria-hidden="true" /></span>;
+}
 
 function loadSettings() {
     const defaults = { count: 10, timer: false, teams: false };
@@ -30,13 +42,13 @@ function Background() {
             <span className="quiz-orb o1" />
             <span className="quiz-orb o2" />
             <span className="quiz-orb o3" />
-            {BG_SYMBOLS.map((s, i) => (
+            {BG_SYMBOLS.map((Sym, i) => (
                 <span key={i} className="quiz-float" style={{
                     left: `${(i * 97) % 100}%`,
                     animationDelay: `${-i * 2.7}s`,
                     animationDuration: `${22 + (i % 4) * 5}s`,
                     fontSize: `${2 + (i % 3) * 0.9}rem`,
-                }}>{s}</span>
+                }}><Sym /></span>
             ))}
         </div>
     );
@@ -62,7 +74,7 @@ function SetupScreen({ settings, onChange, onStart, locked }) {
     return (
         <div className="quiz-setup">
             <div className="quiz-hero">
-                <div className="quiz-hero-icon">🏆</div>
+                <div className="quiz-hero-icon"><Emblem id="quiz" /></div>
                 <div>
                     <h2>Научная викторина</h2>
                     <p className="muted">Настройте игру и выберите тему — вопросы начнутся сразу</p>
@@ -79,11 +91,11 @@ function SetupScreen({ settings, onChange, onStart, locked }) {
                 </div>
                 <button className={`btn quiz-toggle${settings.timer ? ' active' : ''}`} disabled={locked}
                     onClick={() => onChange({ timer: !settings.timer })}>
-                    ⏱ Таймер {TIMER_SECONDS} с: <b>{settings.timer ? 'вкл' : 'выкл'}</b>
+                    <Timer /> Таймер {TIMER_SECONDS} с: <b>{settings.timer ? 'вкл' : 'выкл'}</b>
                 </button>
                 <button className={`btn quiz-toggle${settings.teams ? ' active' : ''}`} disabled={locked}
                     onClick={() => onChange({ teams: !settings.teams })}>
-                    👥 Команды: <b>{settings.teams ? 'вкл' : 'выкл'}</b>
+                    <Users /> Команды: <b>{settings.teams ? 'вкл' : 'выкл'}</b>
                 </button>
             </div>
 
@@ -92,7 +104,7 @@ function SetupScreen({ settings, onChange, onStart, locked }) {
                     <button key={t.id} className={`quiz-topic${t.id === MIXED.id ? ' is-mixed' : ''}`}
                         style={{ '--topic': t.color, animationDelay: `${i * 70}ms` }}
                         disabled={locked} onClick={() => onStart(t.id)}>
-                        <span className="quiz-topic-icon">{t.icon}</span>
+                        <span className="quiz-topic-icon"><TopicIcon id={t.id} /></span>
                         <span className="quiz-topic-label">{t.label}</span>
                         <span className="quiz-topic-hint">{t.hint}</span>
                     </button>
@@ -157,8 +169,8 @@ function QuestionScreen({ question, index, total, results, chosen, team, timeLef
                             onClick={(e) => onAnswer(i, e.currentTarget)}>
                             <span className="quiz-tile-letter">{LETTERS[i]}</span>
                             <span className="quiz-tile-text">{opt}</span>
-                            {state === ' is-correct' && <span className="quiz-tile-mark">✔</span>}
-                            {state === ' is-wrong' && <span className="quiz-tile-mark">✘</span>}
+                            {state === ' is-correct' && <CircleCheck className="quiz-tile-mark" aria-label="верно" />}
+                            {state === ' is-wrong' && <CircleX className="quiz-tile-mark" aria-label="неверно" />}
                         </button>
                     );
                 })}
@@ -169,13 +181,13 @@ function QuestionScreen({ question, index, total, results, chosen, team, timeLef
                     <div className={`quiz-feedback ${ok ? 'good' : 'bad'}`}>
                         <div className="quiz-feedback-text">
                             <div className="quiz-verdict">
-                                {ok ? '✔ Верно!' : `✘ Неверно. Правильный ответ: ${LETTERS[question.correct]}`}
+                                {ok ? <><CircleCheck className="ico" aria-hidden="true" /> Верно!</> : <><CircleX className="ico" aria-hidden="true" /> Неверно. Правильный ответ: {LETTERS[question.correct]}</>}
                                 {team && ok && <span className="quiz-verdict-team" style={{ color: team.color }}> +1 {team.label}</span>}
                             </div>
                             <p className="quiz-explain">{question.explain}</p>
                         </div>
                         <button className="btn btn-primary quiz-next" disabled={locked} onClick={onNext}>
-                            {isLast ? 'Итоги 🏁' : 'Дальше →'}
+                            {isLast ? <>Итоги <Flag /></> : <>Дальше <ArrowRight /></>}
                         </button>
                     </div>
                 ) : timerOn ? (
@@ -200,14 +212,15 @@ function QuestionScreen({ question, index, total, results, chosen, team, timeLef
 
 function ResultsScreen({ results, total, teams, locked, onAgain, onSetup, onMenu }) {
     const correct = results.filter(Boolean).length;
-    const { emoji, title, note } = resultTitle(correct, total);
+    const { icon, title, note } = resultTitle(correct, total);
     const teamScores = TEAMS.map((_, t) => results.filter((r, i) => r && i % 2 === t).length);
     const teamAsked = TEAMS.map((_, t) => results.filter((_, i) => i % 2 === t).length);
     const winner = teamScores[0] === teamScores[1] ? null : teamScores[0] > teamScores[1] ? 0 : 1;
+    const ResultIcon = teams ? (winner === null ? Handshake : Crown) : RESULT_ICONS[icon];
 
     return (
         <div className="quiz-results">
-            <div className="quiz-results-emoji">{teams ? (winner === null ? '🤝' : '👑') : emoji}</div>
+            <div className="quiz-results-emoji"><ResultIcon /></div>
             {teams ? (
                 <>
                     <h2 className="quiz-results-title">
@@ -216,7 +229,7 @@ function ResultsScreen({ results, total, teams, locked, onAgain, onSetup, onMenu
                     <div className="quiz-team-final">
                         {TEAMS.map((t, i) => (
                             <div key={t.id} className={`quiz-team-card${winner === i ? ' winner' : ''}`} style={{ '--team': t.color }}>
-                                <span className="quiz-team-name">{t.icon} {t.label}</span>
+                                <span className="quiz-team-name"><i className="quiz-team-dot" />{t.label}</span>
                                 <span className="quiz-team-score">{teamScores[i]}</span>
                                 <span className="muted">из {teamAsked[i]}</span>
                             </div>
@@ -234,9 +247,9 @@ function ResultsScreen({ results, total, teams, locked, onAgain, onSetup, onMenu
                 {results.map((r, i) => <span key={i} className={`quiz-dot ${r ? 'ok' : 'bad'}`} />)}
             </div>
             <div className="quiz-results-actions">
-                <button className="btn btn-primary" disabled={locked} onClick={onAgain}>↻ Ещё раз</button>
+                <button className="btn btn-primary" disabled={locked} onClick={onAgain}><RotateCcw /> Ещё раз</button>
                 <button className="btn" disabled={locked} onClick={onSetup}>Сменить тему</button>
-                <button className="btn btn-ghost" disabled={locked} onClick={onMenu}>← Меню</button>
+                <button className="btn btn-ghost" disabled={locked} onClick={onMenu}><ArrowLeft /> Меню</button>
             </div>
         </div>
     );
@@ -349,7 +362,7 @@ export default function QuizLab({ onBack }) {
                         const score = results.filter((r, i) => r && i % 2 === ti).length;
                         return (
                             <div key={t.id} className={`quiz-score-pill${team?.id === t.id ? ' active' : ''}`} style={{ '--team': t.color }}>
-                                <span>{t.icon} {t.label}</span>
+                                <span><i className="quiz-team-dot" />{t.label}</span>
                                 <b key={score} className="quiz-score-num">{score}</b>
                             </div>
                         );
@@ -362,14 +375,14 @@ export default function QuizLab({ onBack }) {
                     <span className="muted">из {results.length}</span>
                 </div>
             )}
-            <button className="btn btn-small btn-ghost" onClick={toSetup}>✕ Завершить</button>
+            <button className="btn btn-small btn-ghost" onClick={toSetup}><X /> Завершить</button>
         </>
     ) : null;
 
     const subtitle = phase === 'setup' ? 'Игра для всего класса' : topicById(round.topic).label;
 
     return (
-        <LabShell title="Викторина" subtitle={subtitle} icon="🏆" accent="var(--quiz)" onBack={onBack} actions={actions}>
+        <LabShell title="Викторина" subtitle={subtitle} subject="quiz" onBack={onBack} actions={actions}>
             <Background />
             <main className={`quiz-stage${locked ? ' is-locked' : ''}`}>
                 {phase === 'setup' && (

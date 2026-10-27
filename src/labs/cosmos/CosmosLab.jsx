@@ -1,5 +1,6 @@
 // Cosmos lab: an interactive solar system for classroom lessons (hand + mouse control).
 import React, { useCallback, useRef, useState } from 'react';
+import { Lightbulb, Pause, Play } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
 import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
@@ -9,6 +10,7 @@ import { MOON_FACTS, MOON_PHASES, SYNODIC, angleOfDay, formatDay, litFraction, p
 import { InfoCard, IntroCard, RealScaleCard } from './InfoCard';
 import { BAR_BODIES, BODY_BY_ID, SPEEDS } from './bodies';
 import { textureUrl } from './textures';
+import { initialLabMode, rememberLabMode } from '../../ui/labMode';
 import './cosmos.css';
 
 const CAMERA = { position: [0, 30, 80], fov: 50, near: 0.05, far: 5000 };
@@ -17,7 +19,11 @@ export default function CosmosLab({ onBack }) {
     const [selectedId, setSelectedId] = useState(null);
     const [flyKey, setFlyKey] = useState(0);
     const [speedIdx, setSpeedIdx] = useState(2);
-    const [mode, setMode] = useState('visual'); // 'visual' | 'real' | 'moon'
+    const [mode, setModeState] = useState(() => initialLabMode('visual', ['visual', 'real', 'moon']));
+    const setMode = m => {
+        setModeState(m);
+        rememberLabMode(m);
+    };
     const realScale = mode === 'real';
     const [moonDay, setMoonDay] = useState(phaseDay(2));
     const [moonGoto, setMoonGoto] = useState({ day: phaseDay(2) });
@@ -54,7 +60,7 @@ export default function CosmosLab({ onBack }) {
     );
 
     return (
-        <LabShell title="Космос" subtitle={mode === 'moon' ? 'Фазы Луны' : 'Солнечная система'} icon="🪐" accent="var(--cosmos)" onBack={onBack}
+        <LabShell title="Космос" subtitle={mode === 'moon' ? 'Фазы Луны' : 'Солнечная система'} subject="cosmos" onBack={onBack}
             actions={scaleToggle}>
             {mode === 'moon' ? (
                 <>
@@ -67,7 +73,7 @@ export default function CosmosLab({ onBack }) {
                 <div className="panel">
                     <div className="panel-title">Лунный месяц</div>
                     <button className="btn btn-primary moon-play" onClick={() => setMoonPlaying(p => !p)}>
-                        {moonPlaying ? '⏸ Пауза' : '▶ Запустить'}
+                        {moonPlaying ? <><Pause /> Пауза</> : <><Play /> Запустить</>}
                     </button>
                     <label className="moon-day">
                         <span className="muted">День месяца</span>
@@ -90,7 +96,7 @@ export default function CosmosLab({ onBack }) {
                     <div className="moon-view-title">Так Луна видна с Земли</div>
                     <MoonView moonRef={moonRef} />
                     <p className="moon-text">{MOON_PHASES[moonPhase].text}</p>
-                    <p className="cosmos-fact"><span aria-hidden="true">💡 </span>{MOON_FACTS[moonPhase % MOON_FACTS.length]}</p>
+                    <p className="cosmos-fact"><Lightbulb className="ico" aria-hidden="true" /> {MOON_FACTS[moonPhase % MOON_FACTS.length]}</p>
                 </div>
             </aside>
 
@@ -117,7 +123,7 @@ export default function CosmosLab({ onBack }) {
                         {SPEEDS.map((s, i) => (
                             <button key={s.id} className={`btn${i === speedIdx ? ' active' : ''}`} onClick={() => setSpeedIdx(i)}
                                 aria-label={s.id === 'pause' ? 'Пауза' : `Скорость ${s.label}`}>
-                                {s.icon ?? s.label}
+                                {s.id === 'pause' ? <Pause /> : s.label}
                             </button>
                         ))}
                     </div>

@@ -1,5 +1,6 @@
 // Chemistry lab: a molecule constructor. Pick elements, watch the atoms float in the flask, press «Соединить».
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PartyPopper, Target, X } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
 import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
@@ -10,6 +11,7 @@ import {
 } from './match';
 import ChemScene from './ChemScene';
 import ReactionMode from './ReactionMode';
+import { initialLabMode, rememberLabMode } from '../../ui/labMode';
 import './chemistry.css';
 
 const CAMERA = { position: [0, 0.4, 12], fov: 45, near: 0.1, far: 120 };
@@ -113,7 +115,7 @@ function HintCard({ items, empty, onAdd, onClose }) {
         <div className="panel chem-card chem-hints">
             <div className="chem-card-top">
                 <div className="panel-title">{empty ? 'Попробуйте собрать' : 'Что можно получить'}</div>
-                <button className="btn btn-icon chem-close" onClick={onClose} aria-label="Закрыть подсказку">✕</button>
+                <button className="btn btn-icon chem-close" onClick={onClose} aria-label="Закрыть подсказку"><X /></button>
             </div>
             {items.length === 0 && <p className="muted">Подходящих веществ нет. Уберите последний атом или очистите колбу.</p>}
             {items.map(({ mol, add, exact }) => (
@@ -137,7 +139,7 @@ function TaskCard({ task, solved, comp, onAdd, onNext, onEnd }) {
     return (
         <div className="panel chem-card chem-task">
             <div className="chem-card-top">
-                <div className="panel-title">🎯 Задание</div>
+                <div className="panel-title"><Target className="ico" aria-hidden="true" />Задание</div>
                 <span className="chip">Решено: {solved}</span>
             </div>
             <div className="chem-task-name">Соберите: <b>{task.mol.name.toLowerCase()}</b></div>
@@ -169,7 +171,7 @@ function MoleculeCard({ mol, onClose }) {
         <div className="panel chem-card chem-mol" key={mol.id}>
             <div className="chem-card-top">
                 <div className="chem-mol-formula"><Formula text={mol.formula} /></div>
-                <button className="btn btn-icon chem-close" onClick={onClose} aria-label="Закрыть">✕</button>
+                <button className="btn btn-icon chem-close" onClick={onClose} aria-label="Закрыть"><X /></button>
             </div>
             <h2>{mol.name}</h2>
             {mol.alt && <div className="muted chem-alt">{mol.alt}</div>}
@@ -199,7 +201,11 @@ export default function ChemistryLab({ onBack }) {
     const [shakeKey, setShakeKey] = useState(0);
     const [picked, setPicked] = useState(null);
     const [labels, setLabels] = useState(true);
-    const [mode, setMode] = useState('build'); // 'build' | 'react'
+    const [mode, setModeState] = useState(() => initialLabMode('build', ['build', 'react']));
+    const setMode = m => {
+        setModeState(m);
+        rememberLabMode(m);
+    };
     const [hints, setHints] = useState(false);
     const [message, setMessage] = useState('');
     const [task, setTask] = useState(null); // { mol, revealed, done }
@@ -269,7 +275,7 @@ export default function ChemistryLab({ onBack }) {
             if (exact === task.mol) {
                 setSolved(n => n + 1);
                 setTask(t => ({ ...t, done: true }));
-                setToast({ ok: true, text: `🎉 Верно! ${exact.name} — `, formula: exact.formula });
+                setToast({ ok: true, text: `Верно! ${exact.name} — `, formula: exact.formula });
             } else {
                 setToast({ ok: false, text: `Получилось другое вещество: ${exact.name.toLowerCase()}. А нужно: ${task.mol.name.toLowerCase()}` });
             }
@@ -313,7 +319,7 @@ export default function ChemistryLab({ onBack }) {
 
     if (mode === 'react') {
         return (
-            <LabShell title="Химия" subtitle="Химические реакции" icon="🧪" accent="var(--chem)" onBack={onBack}
+            <LabShell title="Химия" subtitle="Химические реакции" subject="chemistry" onBack={onBack}
                 actions={(
                     <div className="chem-view">
                         {modeSwitch}
@@ -328,7 +334,7 @@ export default function ChemistryLab({ onBack }) {
     const viewControls = (
         <div className="chem-view">
             {modeSwitch}
-            <button className={`btn${task ? ' active' : ''}`} onClick={nextTask}>🎯 Задание</button>
+            <button className={`btn${task ? ' active' : ''}`} onClick={nextTask}><Target /> Задание</button>
             <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>Подписи</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(1.18)} aria-label="Отдалить">−</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(0.85)} aria-label="Приблизить">+</button>
@@ -336,7 +342,7 @@ export default function ChemistryLab({ onBack }) {
     );
 
     return (
-        <LabShell title="Химия" subtitle="Конструктор молекул" icon="🧪" accent="var(--chem)" onBack={onBack} actions={viewControls}>
+        <LabShell title="Химия" subtitle="Конструктор молекул" subject="chemistry" onBack={onBack} actions={viewControls}>
             <LabCanvas camera={CAMERA}>
                 <ChemScene atoms={atoms} mol={mol} formKey={formKey} labels={labels} picked={picked} onPick={setPicked} zoom={zoom} shakeKey={shakeKey} />
             </LabCanvas>
@@ -363,7 +369,7 @@ export default function ChemistryLab({ onBack }) {
 
             {toast && (
                 <div className={`lab-toast chem-toast${toast.ok ? ' ok' : ''}`} role="status">
-                    {toast.text}{toast.formula && <Formula text={toast.formula} />}
+                    {toast.ok && <PartyPopper aria-hidden="true" />}{toast.text}{toast.formula && <Formula text={toast.formula} />}
                 </div>
             )}
 
@@ -373,7 +379,7 @@ export default function ChemistryLab({ onBack }) {
                         <button className="btn" onClick={() => setMol(null)}>Разобрать на атомы</button>
                         {task
                             ? <button className="btn btn-primary chem-main" onClick={task.done ? nextTask : () => setMol(null)}>
-                                {task.done ? '🎯 Следующее задание' : 'Попробовать ещё'}
+                                {task.done ? <><Target /> Следующее задание</> : 'Попробовать ещё'}
                             </button>
                             : <button className="btn btn-primary chem-main" onClick={clear}>Новая колба</button>}
                     </>

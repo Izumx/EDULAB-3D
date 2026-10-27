@@ -1,5 +1,6 @@
 // «Реакции» mode: pick a reaction, balance the equation with coefficient steppers, then run it in 3D.
 import React, { useCallback, useMemo, useState } from 'react';
+import { ArrowRight, Check, CircleCheck, Play, RotateCcw, X } from 'lucide-react';
 import { LabCanvas } from '../../ui/three';
 import { ELEMENTS } from './elements';
 import { BY_ID, formulaParts } from './match';
@@ -105,7 +106,7 @@ export default function ReactionMode({ labels, zoom }) {
                     <div className="rx-list">
                         {REACTIONS.map(r => (
                             <button key={r.id} className={`btn rx-item${r.id === rid ? ' active' : ''}`} onClick={() => pick(r.id)}>
-                                {solvedIds.has(r.id) && <span className="rx-check" aria-label="проведена">✓</span>}
+                                {solvedIds.has(r.id) && <CircleCheck className="rx-check" aria-label="проведена" />}
                                 {r.name}
                             </button>
                         ))}
@@ -134,7 +135,7 @@ export default function ReactionMode({ labels, zoom }) {
                                             <td><i style={{ background: ELEMENTS[r.el].color }} />{r.el}</td>
                                             <td>{r.left}</td>
                                             <td>{r.right}</td>
-                                            <td>{r.left === r.right ? '✓' : '✗'}</td>
+                                            <td>{r.left === r.right ? <Check className="ico rx-ok" aria-label="да" /> : <X className="ico rx-bad" aria-label="нет" />}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -160,15 +161,15 @@ export default function ReactionMode({ labels, zoom }) {
 
             <nav className="lab-bottom chem-bar" aria-label="Действия">
                 {done ? (
-                    <button className="btn" onClick={() => { setRunKey(0); setDone(false); }}>↺ Ещё раз</button>
+                    <button className="btn" onClick={() => { setRunKey(0); setDone(false); }}><RotateCcw /> Ещё раз</button>
                 ) : (
                     <button className="btn" onClick={reveal} disabled={running}>Подсказка</button>
                 )}
                 <button className="btn btn-primary chem-main" onClick={run} disabled={!balanced || running}>
-                    {running ? 'Идёт реакция…' : '▶ Провести реакцию'}
+                    {running ? 'Идёт реакция…' : <><Play /> Провести реакцию</>}
                 </button>
                 {done && (
-                    <button className="btn" onClick={() => pick(REACTIONS[(REACTIONS.indexOf(reaction) + 1) % REACTIONS.length].id)}>Следующая →</button>
+                    <button className="btn" onClick={() => pick(REACTIONS[(REACTIONS.indexOf(reaction) + 1) % REACTIONS.length].id)}>Следующая <ArrowRight /></button>
                 )}
             </nav>
         </>

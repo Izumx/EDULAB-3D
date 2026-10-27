@@ -1,5 +1,6 @@
 // Panels of the «Виды» mode: the three views drawn as small grids, the base grid for heights, the task card.
 import React from 'react';
+import { Check, X } from 'lucide-react';
 import { MAX_H, N, cubeCount, idx, views } from './voxels';
 
 const CELL = 12;
@@ -24,7 +25,7 @@ export function ViewGrid({ kind, grid, ok, numbers, compact }) {
                     </text>
                 )))}
             </svg>
-            <figcaption>{compact ? SHORT_NAMES[kind] : VIEW_NAMES[kind]}{ok === true ? ' ✓' : ok === false ? ' ✗' : ''}</figcaption>
+            <figcaption>{compact ? SHORT_NAMES[kind] : VIEW_NAMES[kind]}{ok === true ? <Check className="ico views-ok" aria-label="совпадает" /> : ok === false ? <X className="ico views-bad" aria-label="не совпадает" /> : null}</figcaption>
         </figure>
     );
 }

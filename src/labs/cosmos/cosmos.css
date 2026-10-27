@@ -450,3 +450,7 @@
 .moon-phase-btn svg {
     flex: none;
 }
+
+.cosmos-fact .ico {
+    color: #fde047;
+}

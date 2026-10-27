@@ -75,7 +75,7 @@ export function makeLetterTexture(letter, color) {
     ctx.strokeStyle = color;
     ctx.stroke();
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 76px Inter, "Segoe UI", Arial, sans-serif';
+    ctx.font = '900 76px Nunito, "Segoe UI", Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(letter, size / 2, size / 2 + 4);

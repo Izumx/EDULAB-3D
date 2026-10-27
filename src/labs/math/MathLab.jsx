@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { LabShell } from '../../ui/LabShell';
 import SolidsMode from './SolidsMode';
+import { initialLabMode, rememberLabMode } from '../../ui/labMode';
 import ViewsMode from './ViewsMode';
 import './math.css';
 
@@ -11,7 +12,11 @@ const MODES = [
 ];
 
 export default function MathLab({ onBack }) {
-    const [mode, setMode] = useState('solids');
+    const [mode, setModeState] = useState(() => initialLabMode('solids', MODES.map(m => m.id)));
+    const setMode = m => {
+        setModeState(m);
+        rememberLabMode(m);
+    };
     const current = MODES.find(m => m.id === mode);
     const tabs = (
         <div className="math-seg" role="group" aria-label="Режим">
@@ -21,7 +26,7 @@ export default function MathLab({ onBack }) {
         </div>
     );
     return (
-        <LabShell title="Математика" subtitle={current.subtitle} icon="📐" accent="var(--math)" onBack={onBack} actions={tabs}>
+        <LabShell title="Математика" subtitle={current.subtitle} subject="math" onBack={onBack} actions={tabs}>
             {mode === 'solids' && <SolidsMode />}
             {mode === 'views' && <ViewsMode />}
         </LabShell>

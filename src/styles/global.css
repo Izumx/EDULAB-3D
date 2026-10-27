@@ -1,15 +1,18 @@
-/* EduLab 3D design system: dark, high-contrast, large type — readable on a classroom projector. */
+/* EduLab 3D design system: a friendly "classroom board" look — deep navy, notebook grid, rounded type,
+   chunky buttons that look pressable, subject colours. Dark and high-contrast, so it stays readable on a projector. */
 :root {
-    --bg: #070b16;
-    --bg-elev: #0d1322;
-    --surface: rgba(18, 25, 44, 0.8);
-    --surface-strong: rgba(26, 35, 60, 0.94);
-    --surface-hover: rgba(40, 52, 86, 0.95);
-    --border: rgba(255, 255, 255, 0.14);
+    --bg: #0b1426;
+    --bg-elev: #111d35;
+    --surface: rgba(16, 27, 50, 0.86);
+    --surface-strong: rgba(25, 39, 69, 0.97);
+    --surface-hover: rgba(37, 56, 96, 0.98);
+    --border: rgba(255, 255, 255, 0.13);
     --border-strong: rgba(255, 255, 255, 0.28);
-    --text: #f5f7fb;
-    --text-muted: #b6c0d6;
-    --text-dim: #8b96ad;
+    --text: #f7f9fd;
+    --text-muted: #bac6dc;
+    --text-dim: #8c99b3;
+    --grid-line: rgba(148, 178, 230, 0.07);
+    --press: rgba(0, 0, 0, 0.42);
     --danger: #f87171;
     --success: #4ade80;
 
@@ -23,11 +26,11 @@
     --geo: #fb923c;
     --accent: var(--chem);
 
-    --radius: 18px;
-    --radius-sm: 12px;
+    --radius: 20px;
+    --radius-sm: 14px;
     --shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
-    --font-display: 'Unbounded', 'Inter', system-ui, sans-serif;
-    --font-body: 'Inter', system-ui, 'Segoe UI', sans-serif;
+    --font-display: 'Nunito', system-ui, 'Segoe UI', sans-serif;
+    --font-body: 'Nunito', system-ui, 'Segoe UI', sans-serif;
 
     /* Lab layout: keep these corners clear for the camera preview and the chatbot */
     --header-h: 76px;
@@ -35,6 +38,7 @@
 
     color-scheme: dark;
     font-family: var(--font-body);
+    font-weight: 500;
     /* Scales with screen width: ~18px on a 1366px projector, ~21px on 1080p */
     font-size: clamp(16px, 0.55vw + 10.5px, 22px);
     line-height: 1.45;
@@ -61,10 +65,10 @@ body,
 
 h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 800;
     line-height: 1.15;
     margin: 0;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
 }
 
 p {
@@ -72,21 +76,30 @@ p {
 }
 
 /* ---------- Buttons ---------- */
+/* Chunky "pressable" buttons: a darker bottom edge that disappears when pressed — clear even from the back row */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5em;
     min-height: 3.1rem;
-    padding: 0 1.3rem;
+    padding: 0 1.25rem;
     border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     background: var(--surface-strong);
+    box-shadow: 0 4px 0 var(--press);
     color: var(--text);
-    font: 600 1rem/1.2 var(--font-body);
+    font: 700 1rem/1.2 var(--font-body);
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    transition: background 0.15s, border-color 0.15s, transform 0.08s, box-shadow 0.08s, filter 0.15s;
     user-select: none;
+}
+
+.btn svg {
+    flex: none;
+    width: 1.3em;
+    height: 1.3em;
+    stroke-width: 2.4;
 }
 
 .btn:hover,
@@ -96,7 +109,8 @@ p {
 }
 
 .btn:active {
-    transform: scale(0.97);
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--press);
 }
 
 .btn:focus-visible {
@@ -107,28 +121,37 @@ p {
 .btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+    transform: none;
 }
 
 .btn-primary {
     background: var(--accent);
     border-color: transparent;
-    color: #05101a;
+    color: #08111f;
+    box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 50%, #000);
 }
 
 .btn-primary:hover,
 .btn-primary.hand-hover {
     background: var(--accent);
-    filter: brightness(1.12);
+    border-color: color-mix(in srgb, var(--accent) 60%, #fff);
+    filter: brightness(1.08);
+}
+
+.btn-primary:active {
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 50%, #000);
 }
 
 .btn-ghost {
     background: transparent;
+    box-shadow: none;
 }
 
 .btn-small {
     min-height: 2.4rem;
     padding: 0 0.9rem;
     font-size: 0.9rem;
+    box-shadow: 0 3px 0 var(--press);
 }
 
 .btn-icon {
@@ -137,10 +160,26 @@ p {
     font-size: 1.4rem;
 }
 
+.btn-icon svg {
+    width: 1.45rem;
+    height: 1.45rem;
+}
+
 .btn.active {
     background: var(--accent);
-    color: #05101a;
+    color: #08111f;
     border-color: transparent;
+    box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 50%, #000);
+}
+
+/* inline icon inside text */
+.ico {
+    display: inline-block;
+    flex: none;
+    width: 1.15em;
+    height: 1.15em;
+    vertical-align: -0.2em;
+    stroke-width: 2.3;
 }
 
 /* ---------- Panels ---------- */
@@ -149,16 +188,29 @@ p {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     backdrop-filter: blur(14px);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     padding: 1.1rem 1.2rem;
 }
 
+/* section label with a small colour marker, like a tab in an exercise book */
 .panel-title {
-    font: 600 0.8rem/1.2 var(--font-body);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font: 800 0.8rem/1.2 var(--font-body);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.09em;
     color: var(--text-muted);
     margin-bottom: 0.7rem;
+}
+
+.panel-title::before {
+    content: '';
+    flex: none;
+    width: 0.32rem;
+    height: 0.95rem;
+    border-radius: 3px;
+    background: var(--accent);
 }
 
 .chip {
@@ -170,7 +222,13 @@ p {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border);
     font-size: 0.85rem;
+    font-weight: 700;
     color: var(--text-muted);
+}
+
+.chip svg {
+    width: 1.1em;
+    height: 1.1em;
 }
 
 .muted {
@@ -182,6 +240,20 @@ p {
     position: fixed;
     inset: 0;
     background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 10%, var(--bg)) 0%, var(--bg) 70%);
+}
+
+/* squared exercise-book paper under the 3D scene (labs may change the colour, the grid stays) */
+.lab::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 2.2rem 2.2rem;
+    background-position: center center;
+    mask-image: radial-gradient(ellipse at 50% 45%, #000 30%, transparent 85%);
 }
 
 .lab-canvas {
@@ -217,21 +289,29 @@ p {
 .lab-title-icon {
     display: grid;
     place-items: center;
-    width: 2.8rem;
-    height: 2.8rem;
-    border-radius: 14px;
-    font-size: 1.5rem;
-    background: color-mix(in srgb, var(--accent) 22%, transparent);
-    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    width: 3rem;
+    height: 3rem;
+    filter: drop-shadow(0 4px 14px color-mix(in srgb, var(--accent) 45%, transparent));
+}
+
+.lab-title-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .lab-title h1 {
-    font-size: 1.35rem;
+    font-size: 1.45rem;
+    font-weight: 900;
 }
 
 .lab-title p {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
+    font-weight: 600;
     color: var(--text-muted);
+}
+
+.lab-back {
+    padding: 0 1.05rem 0 0.8rem;
 }
 
 .lab-header-actions {
@@ -281,23 +361,33 @@ p {
     left: 50%;
     transform: translateX(-50%);
     z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
     padding: 0.7rem 1.4rem;
     border-radius: 999px;
     background: var(--surface-strong);
-    border: 1px solid var(--accent);
-    font-weight: 600;
+    border: 2px solid var(--accent);
+    box-shadow: var(--shadow);
+    font-weight: 800;
     font-size: 1.05rem;
     white-space: nowrap;
+}
+
+.lab-toast svg {
+    flex: none;
+    width: 1.4em;
+    height: 1.4em;
 }
 
 /* 3D labels (drei <Html>) */
 .label-3d {
     padding: 0.2em 0.7em;
     border-radius: 999px;
-    background: rgba(7, 11, 22, 0.8);
-    border: 1px solid var(--border-strong);
+    background: rgba(8, 15, 30, 0.84);
+    border: 1.5px solid var(--border-strong);
     color: var(--text);
-    font: 600 0.95rem/1.3 var(--font-body);
+    font: 700 0.95rem/1.3 var(--font-body);
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
@@ -309,7 +399,7 @@ p {
     display: grid;
     place-items: center;
     color: var(--text-muted);
-    font: 500 1.2rem var(--font-display);
+    font: 700 1.2rem var(--font-display);
 }
 
 ::-webkit-scrollbar {
@@ -326,4 +416,12 @@ p {
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+.ico-spin {
+    animation: ico-spin 1s linear infinite;
+}
+
+@keyframes ico-spin {
+    to { transform: rotate(360deg); }
 }
