@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "check:chem": "node scripts/check-chemistry.mjs",
-    "check:math": "node scripts/check-math.mjs"
+    "check:math": "node scripts/check-math.mjs",
+    "check:geo": "node scripts/check-geo.mjs",
+    "check": "npm run lint && npm run check:chem && npm run check:math && npm run check:geo"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

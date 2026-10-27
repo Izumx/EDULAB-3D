@@ -7,11 +7,12 @@ import { startTracker } from '../hand/tracker';
 import './Dashboard.css';
 
 const MODULES = [
-    { id: 'chemistry', title: 'Химия', icon: '🧪', desc: 'Собирайте молекулы из атомов', color: 'var(--chem)' },
-    { id: 'biology', title: 'Биология', icon: '🧬', desc: 'Клетка, органоиды и ДНК', color: 'var(--bio)' },
+    { id: 'chemistry', title: 'Химия', icon: '🧪', desc: 'Молекулы из атомов и химические реакции', color: 'var(--chem)' },
+    { id: 'biology', title: 'Биология', icon: '🧬', desc: 'Клетка, митоз и ДНК', color: 'var(--bio)' },
     { id: 'physics', title: 'Физика', icon: '🍎', desc: 'Гравитация и движение тел', color: 'var(--phys)' },
-    { id: 'cosmos', title: 'Космос', icon: '🪐', desc: 'Путешествие по Солнечной системе', color: 'var(--cosmos)' },
+    { id: 'cosmos', title: 'Космос', icon: '🪐', desc: 'Солнечная система и фазы Луны', color: 'var(--cosmos)' },
     { id: 'math', title: 'Математика', icon: '📐', desc: 'Тела, развёртки и чертежи', color: 'var(--math)' },
+    { id: 'geo', title: 'География', icon: '🌍', desc: 'Глобус, координаты и времена года', color: 'var(--geo)' },
     { id: 'quiz', title: 'Викторина', icon: '🏆', desc: 'Проверка знаний всем классом', color: 'var(--quiz)' },
 ];
 

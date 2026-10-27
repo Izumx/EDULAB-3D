@@ -129,10 +129,10 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1.6rem;
+    gap: clamp(0.8rem, 2.4vh, 1.6rem);
     width: min(76rem, 100%);
     margin: 0 auto;
-    padding: 1rem 2rem 3rem;
+    padding: 1rem 2rem 2rem;
 }
 
 .dashboard-heading {
@@ -141,7 +141,7 @@
 
 .module-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.2rem;
 }
 
@@ -151,8 +151,8 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.4rem;
-    min-height: 12.5rem;
-    padding: 1.5rem 1.6rem;
+    min-height: clamp(9.5rem, 24vh, 12.5rem);
+    padding: 1.2rem 1.4rem;
     border-radius: 24px;
     border: 1px solid var(--border);
     background:
@@ -183,7 +183,7 @@ button.module-card.hand-hover {
 }
 
 .module-title {
-    font: 600 1.6rem/1.2 var(--font-display);
+    font: 600 1.45rem/1.2 var(--font-display);
 }
 
 .module-desc {
@@ -198,19 +198,32 @@ button.module-card.hand-hover {
     border-style: dashed;
 }
 
+.help-card {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.6rem;
+    min-height: 0;
+    padding: 0.8rem 7.5rem 0.8rem 1.4rem; /* the chat button floats over the right corner */
+}
+
 .help-card .module-title {
-    font-size: 1.15rem;
-    margin-bottom: 0.4rem;
+    flex: none;
+    font-size: 1.05rem;
+    margin: 0;
 }
 
 .help-card ul {
+    flex: 1;
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.55rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.3;
 }
 
 .help-card li span {

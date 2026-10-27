@@ -12,6 +12,8 @@ const MODE_NAMES = {
     biology: 'Биология',
     physics: 'Физика',
     cosmos: 'Космос',
+    math: 'Математика',
+    geo: 'География',
     quiz: 'Викторина',
 };
 
@@ -21,7 +23,9 @@ const QUICK_QUESTIONS = {
     chemistry: ['Что такое ковалентная связь?', 'Почему вода — полярная молекула?', 'Чем ионная связь отличается от ковалентной?'],
     biology: ['Зачем клетке митохондрии?', 'Чем растительная клетка отличается от животной?', 'Как устроена ДНК?'],
     physics: ['Почему перо падает медленнее шара?', 'Что такое ускорение свободного падения?', 'Почему на Луне всё легче?'],
-    cosmos: ['Почему у Венеры такая жара?', 'Сколько лететь до Марса?', 'Почему Плутон больше не планета?'],
+    cosmos: ['Почему у Венеры такая жара?', 'Почему Луна меняет фазы?', 'Почему Плутон больше не планета?'],
+    math: ['Что такое развёртка многогранника?', 'Почему объём пирамиды в 3 раза меньше призмы?', 'Что такое формула Эйлера?'],
+    geo: ['Чем широта отличается от долготы?', 'Почему бывает полярная ночь?', 'Почему времена года меняются?'],
     quiz: ['Объясни последний ответ подробнее', 'Дай подсказку, не называя ответ', 'Придумай похожий вопрос'],
 };
 
@@ -88,7 +92,7 @@ export const AIChatbot = ({ mode }) => {
                         {
                             role: 'system',
                             content: `You are EduBot, a friendly science teaching assistant inside EduLab 3D, a 3D science app used in school lessons on a projector.
-The teacher is currently in the "${MODE_NAMES[mode] || mode}" section. The app has labs: Chemistry (build molecules), Biology (cell organelles, DNA), Physics (gravity, free fall, air resistance), Cosmos (Solar System), and a class Quiz. Users control it with hand gestures through the webcam.
+The teacher is currently in the "${MODE_NAMES[mode] || mode}" section. The app has labs: Chemistry (build molecules, balance reactions), Biology (cell organelles, DNA, mitosis), Physics (gravity, free fall, air resistance), Cosmos (Solar System, Moon phases), Math (solids, nets, views of a figure), Geography (globe, coordinates, seasons and day length), and a class Quiz. Users control it with hand gestures through the webcam.
 Answer for school students (grades 7–10): accurate, short (2–5 sentences), clear, with a simple example when helpful. Answer in the same language the user writes in (usually Russian).`
                         },
                         ...history.slice(-HISTORY_LIMIT).map(m => ({

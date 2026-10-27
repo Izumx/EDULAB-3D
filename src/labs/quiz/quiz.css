@@ -165,7 +165,7 @@
 
 .quiz-topics {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(0.6rem, 1.6vh, 1rem);
 }
 
@@ -176,8 +176,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    min-height: clamp(9rem, 26vh, 15rem);
-    padding: 1rem 0.8rem;
+    min-height: clamp(7.2rem, 19vh, 12rem);
+    padding: 0.8rem 0.8rem;
     border-radius: 22px;
     border: 2px solid color-mix(in srgb, var(--topic) 55%, transparent);
     background:
