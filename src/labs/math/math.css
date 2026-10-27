@@ -1,0 +1,404 @@
+/* Math lab */
+.lab:has(.math-bar) {
+    background: radial-gradient(ellipse at 50% 45%, #0e1a33 0%, #080d1c 60%, #04060d 100%);
+}
+
+.math-seg {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.3rem;
+    border-radius: calc(var(--radius-sm) + 0.3rem);
+    background: rgba(7, 11, 22, 0.7);
+    border: 1px solid var(--border);
+}
+
+.math-seg .btn {
+    min-height: 2.8rem;
+    background: transparent;
+    border-color: transparent;
+}
+
+.math-seg .btn.active {
+    background: var(--accent);
+    color: #061226;
+}
+
+/* ---------- left: solids and sizes ---------- */
+.math-left {
+    width: min(20rem, 28vw);
+}
+
+.math-list-panel {
+    padding: 0.9rem 0.9rem 0.8rem;
+}
+
+.math-group + .math-group {
+    margin-top: 0.5rem;
+}
+
+.math-group-title {
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.math-solids {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.3rem;
+}
+
+.math-kind {
+    margin-top: 0.15rem;
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+.btn.math-solid {
+    min-height: 2.6rem;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.9rem;
+    line-height: 1.1;
+}
+
+.math-size-title {
+    margin: 0.7rem 0 0.1rem;
+}
+
+.math-slider {
+    display: block;
+    margin-top: 0.15rem;
+}
+
+.math-slider-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.92rem;
+}
+
+.math-slider-head b {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+
+.math-slider input,
+.math-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2.2rem;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.math-slider input::-webkit-slider-runnable-track,
+.math-range::-webkit-slider-runnable-track {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--accent) var(--fill), rgba(255, 255, 255, 0.16) var(--fill));
+}
+
+.math-slider input::-webkit-slider-thumb,
+.math-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-top: -0.58rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--accent);
+}
+
+.math-slider input::-moz-range-track,
+.math-range::-moz-range-track {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.math-slider input::-moz-range-progress,
+.math-range::-moz-range-progress {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: var(--accent);
+}
+
+.math-slider input::-moz-range-thumb,
+.math-range::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--accent);
+}
+
+/* ---------- right: card ---------- */
+.math-right {
+    width: min(25rem, 33vw);
+}
+
+.math-card {
+    padding: 1rem 1.15rem 1.1rem;
+    animation: math-in 0.3s ease-out;
+}
+
+@keyframes math-in {
+    from { opacity: 0; transform: translateX(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+.math-card h2 {
+    font-size: 1.4rem;
+}
+
+.math-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+}
+
+.math-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.35rem 0.2rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+}
+
+.math-stat b {
+    font: 600 1.5rem/1.1 var(--font-display);
+    color: var(--accent);
+}
+
+.math-stat span {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.math-euler {
+    margin-top: 0.5rem;
+    font-size: 0.98rem;
+}
+
+.math-euler b {
+    color: var(--accent);
+}
+
+.math-faces {
+    margin-top: 0.25rem;
+    font-size: 0.92rem;
+}
+
+.math-formula {
+    margin-top: 0.7rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.math-formula-title {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.math-formula-main {
+    font: 600 1.1rem/1.3 var(--font-display);
+}
+
+.math-formula-calc {
+    margin-top: 0.15rem;
+    font-size: 0.98rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.math-formula-calc b {
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+.math-note {
+    margin-top: 0.7rem;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+/* ---------- bottom bar ---------- */
+.math-bar {
+    width: max-content;
+    max-width: calc(100% - 22rem);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.math-bar .math-range {
+    width: min(11rem, 16vw);
+}
+
+.math-zoom {
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.math-fold {
+    min-width: 9.6rem;
+}
+
+.math-chip {
+    font-size: 0.95rem;
+    padding: 0.5em 1em;
+    color: var(--text);
+}
+
+/* ---------- «Виды» ---------- */
+.views-base {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+    width: min(100%, 14.5rem);
+    margin: 0.3rem auto 0;
+}
+
+.btn.views-cell {
+    min-height: 0;
+    aspect-ratio: 1;
+    padding: 0;
+    font: 700 1.3rem var(--font-display);
+    color: #04101f;
+    background: color-mix(in srgb, var(--accent) calc(var(--lvl) * 90%), rgba(255, 255, 255, 0.07));
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn.views-cell:not(.filled) {
+    color: transparent;
+}
+
+.views-base-note {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.views-remove-note {
+    grid-column: 1 / -1;
+    font-size: 0.9rem;
+    color: var(--danger);
+}
+
+.views-mode {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+}
+
+.views-card .math-note {
+    margin-top: 0.5rem;
+}
+
+.views-sub {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.views-triple {
+    display: grid;
+    grid-template-columns: repeat(2, 8.6rem);
+    justify-content: center;
+    gap: 0.4rem 0.6rem;
+}
+
+/* task mode shows two sets of views at once, so they are drawn smaller and in one row */
+.views-triple.compact {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+}
+
+.views-triple.compact .views-fig {
+    padding: 0.15rem;
+}
+
+.views-triple.compact figcaption {
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.views-triple.compact .views-count b {
+    font-size: 1.5rem;
+}
+
+.views-fig {
+    margin: 0;
+    padding: 0.3rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.views-fig.ok {
+    border-color: var(--success);
+}
+
+.views-fig.bad {
+    border-color: rgba(248, 113, 113, 0.5);
+}
+
+.views-fig svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.views-fig figcaption {
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.views-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.views-count b {
+    font: 600 2rem/1.1 var(--font-display);
+    color: var(--accent);
+}
+
+.views-count span {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.views-hint {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.views-hint b {
+    color: var(--accent);
+}
+
+.lab-toast.views-toast {
+    white-space: normal;
+    max-width: min(34rem, calc(100% - 50rem));
+    text-align: center;
+    border-color: var(--danger);
+}
+
+.lab-toast.views-toast.ok {
+    border-color: var(--success);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--success) 35%, transparent);
+}

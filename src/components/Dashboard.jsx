@@ -11,6 +11,7 @@ const MODULES = [
     { id: 'biology', title: 'Биология', icon: '🧬', desc: 'Клетка, органоиды и ДНК', color: 'var(--bio)' },
     { id: 'physics', title: 'Физика', icon: '🍎', desc: 'Гравитация и движение тел', color: 'var(--phys)' },
     { id: 'cosmos', title: 'Космос', icon: '🪐', desc: 'Путешествие по Солнечной системе', color: 'var(--cosmos)' },
+    { id: 'math', title: 'Математика', icon: '📐', desc: 'Тела, развёртки и чертежи', color: 'var(--math)' },
     { id: 'quiz', title: 'Викторина', icon: '🏆', desc: 'Проверка знаний всем классом', color: 'var(--quiz)' },
 ];
 
