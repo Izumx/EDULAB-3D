@@ -5,20 +5,22 @@ import { useHandSettings, setHandSettings } from '../hand/settings';
 import { startTracker } from '../hand/tracker';
 import { Emblem, Logo } from '../ui/Emblem';
 import { SUBJECTS } from '../ui/subjects';
+import { LANGS, setLang, useLang, useTr } from '../i18n/lang';
 import './Dashboard.css';
 
 const SENSITIVITY = [['low', 'Низкая'], ['medium', 'Средняя'], ['high', 'Высокая']];
 const DWELL = [[0, 'Выкл'], [700, '0,7 с'], [1000, '1 с'], [1500, '1,5 с']];
 
 function CameraControl() {
+    const tr = useTr();
     const settings = useHandSettings();
     const { status, error, present } = useHandStatus();
     const [open, setOpen] = useState(false);
 
-    const label = !settings.cameraEnabled ? 'Управление руками выключено'
+    const label = tr(!settings.cameraEnabled ? 'Управление руками выключено'
         : status === 'loading' ? 'Запускаю камеру…'
             : status === 'error' ? 'Ошибка камеры'
-                : present ? 'Рука найдена' : 'Покажите ладонь камере';
+                : present ? 'Рука найдена' : 'Покажите ладонь камере');
 
     return (
         <div className="camera-control">
@@ -27,43 +29,43 @@ function CameraControl() {
                 {label}
             </div>
             {settings.cameraEnabled ? (
-                <button className="btn" onClick={() => setHandSettings({ cameraEnabled: false })}>Выключить камеру</button>
+                <button className="btn" onClick={() => setHandSettings({ cameraEnabled: false })}>{tr('Выключить камеру')}</button>
             ) : (
-                <button className="btn btn-primary" onClick={() => setHandSettings({ cameraEnabled: true })}><Hand aria-hidden="true" />Включить управление руками</button>
+                <button className="btn btn-primary" onClick={() => setHandSettings({ cameraEnabled: true })}><Hand aria-hidden="true" />{tr('Включить управление руками')}</button>
             )}
-            <button className={`btn btn-icon ${open ? 'active' : ''}`} onClick={() => setOpen(o => !o)} title="Настройки" aria-label="Настройки"><Settings aria-hidden="true" /></button>
+            <button className={`btn btn-icon ${open ? 'active' : ''}`} onClick={() => setOpen(o => !o)} title={tr('Настройки')} aria-label={tr('Настройки')}><Settings aria-hidden="true" /></button>
 
             {open && (
                 <div className="settings-panel panel">
-                    <div className="panel-title">Чувствительность</div>
-                    <p className="muted small">Чем выше, тем меньше нужно двигать рукой. Высокая — если стоите далеко.</p>
+                    <div className="panel-title">{tr('Чувствительность')}</div>
+                    <p className="muted small">{tr('Чем выше, тем меньше нужно двигать рукой. Высокая — если стоите далеко.')}</p>
                     <div className="segmented">
                         {SENSITIVITY.map(([value, text]) => (
                             <button key={value} className={`btn btn-small ${settings.sensitivity === value ? 'active' : ''}`}
-                                onClick={() => setHandSettings({ sensitivity: value })}>{text}</button>
+                                onClick={() => setHandSettings({ sensitivity: value })}>{tr(text)}</button>
                         ))}
                     </div>
-                    <div className="panel-title">Нажатие задержкой руки</div>
+                    <div className="panel-title">{tr('Нажатие задержкой руки')}</div>
                     <div className="segmented">
                         {DWELL.map(([value, text]) => (
                             <button key={value} className={`btn btn-small ${settings.dwellMs === value ? 'active' : ''}`}
-                                onClick={() => setHandSettings({ dwellMs: value })}>{text}</button>
+                                onClick={() => setHandSettings({ dwellMs: value })}>{tr(text)}</button>
                         ))}
                     </div>
-                    <div className="panel-title">Окно камеры</div>
+                    <div className="panel-title">{tr('Окно камеры')}</div>
                     <div className="segmented">
-                        <button className={`btn btn-small ${settings.showPreview ? 'active' : ''}`} onClick={() => setHandSettings({ showPreview: true })}>Показывать</button>
-                        <button className={`btn btn-small ${!settings.showPreview ? 'active' : ''}`} onClick={() => setHandSettings({ showPreview: false })}>Скрыть</button>
+                        <button className={`btn btn-small ${settings.showPreview ? 'active' : ''}`} onClick={() => setHandSettings({ showPreview: true })}>{tr('Показывать')}</button>
+                        <button className={`btn btn-small ${!settings.showPreview ? 'active' : ''}`} onClick={() => setHandSettings({ showPreview: false })}>{tr('Скрыть')}</button>
                     </div>
                     {status === 'error' && (
                         <div className="settings-error">
-                            <p>{error}</p>
-                            <button className="btn btn-small" onClick={() => startTracker()}>Повторить</button>
+                            <p>{tr(error)}</p>
+                            <button className="btn btn-small" onClick={() => startTracker()}>{tr('Повторить')}</button>
                         </div>
                     )}
                     <p className="muted small privacy">
-                        Видео с камеры обрабатывается только на этом компьютере и никуда не отправляется.
-                        Библиотека MediaPipe (Google) может отправлять обезличенную статистику работы.
+                        {tr('Видео с камеры обрабатывается только на этом компьютере и никуда не отправляется.')}{' '}
+                        {tr('Библиотека MediaPipe (Google) может отправлять обезличенную статистику работы.')}
                     </p>
                 </div>
             )}
@@ -91,31 +93,48 @@ const DOODLES = [
     { Icon: Lightbulb, x: '58%', y: '48%', s: 70, r: 12 },
 ];
 
+// РУС / ҚАЗ switch for the whole interface
+function LangSwitch() {
+    const lang = useLang();
+    const tr = useTr();
+    return (
+        <div className="lang-switch" role="group" aria-label={tr('Язык интерфейса')}>
+            {LANGS.map(l => (
+                <button key={l.id} className={`btn btn-small${lang === l.id ? ' active' : ''}`} aria-pressed={lang === l.id}
+                    onClick={() => setLang(l.id)}>{l.label}</button>
+            ))}
+        </div>
+    );
+}
+
 function SubjectCard({ s, onOpen }) {
+    const tr = useTr();
     return (
         <article className="module-card" style={{ '--accent': s.color }}>
             <button className="module-main" onClick={() => onOpen(s.id)}>
                 <span className="module-top">
                     <Emblem id={s.id} size="3.1rem" />
-                    <span className="module-grade">{s.grades}</span>
+                    <span className="module-grade">{tr(s.grades)}</span>
                 </span>
-                <span className="module-title">{s.title}</span>
-                <span className="module-desc">{s.desc}</span>
+                <span className="module-title">{tr(s.title)}</span>
+                <span className="module-desc">{tr(s.desc)}</span>
             </button>
             <div className="module-modes">
                 {s.modes
                     ? s.modes.map(m => (
                         <button key={m.id} className="module-mode" onClick={() => onOpen(`${s.id}/${m.id}`)}>
-                            {m.label}<ChevronRight aria-hidden="true" />
+                            {tr(m.label)}<ChevronRight aria-hidden="true" />
                         </button>
                     ))
-                    : s.tags.map(t => <span key={t} className="module-tag">{t}</span>)}
+                    : s.tags.map(t => <span key={t} className="module-tag">{tr(t)}</span>)}
             </div>
         </article>
     );
 }
 
-export const Dashboard = ({ onOpen }) => (
+export const Dashboard = ({ onOpen }) => {
+    const tr = useTr();
+    return (
     <div className="dashboard">
         <div className="dashboard-bg" aria-hidden="true">
             {DOODLES.map((d, i) => {
@@ -129,22 +148,25 @@ export const Dashboard = ({ onOpen }) => (
                 <Logo size={48} />
                 <div className="brand-text">
                     <span className="brand-name">EduLab <b>3D</b></span>
-                    <span className="brand-sub">Интерактивные 3D-уроки</span>
+                    <span className="brand-sub">{tr('Интерактивные 3D-уроки')}</span>
                 </div>
             </div>
-            <CameraControl />
+            <div className="dashboard-top-actions">
+                <LangSwitch />
+                <CameraControl />
+            </div>
         </header>
 
         <main className="dashboard-main">
             <div className="dashboard-hero">
                 <div>
-                    <h1 className="dashboard-heading">{greeting()}! <span>Какой урок сегодня?</span></h1>
-                    <p>Выберите предмет — или сразу тему внутри него.</p>
+                    <h1 className="dashboard-heading">{tr(greeting())}! <span>{tr('Какой урок сегодня?')}</span></h1>
+                    <p>{tr('Выберите предмет — или сразу тему внутри него.')}</p>
                 </div>
-                <ul className="help-strip" aria-label="Управление руками">
-                    <li title="Ведите ладонью — двигается курсор"><span className="help-ico"><Hand aria-hidden="true" /></span><span><b>Ладонь</b> — курсор</span></li>
-                    <li title="Задержите курсор на кнопке — она нажмётся"><span className="help-ico"><Timer aria-hidden="true" /></span><span><b>Задержка</b> — нажать</span></li>
-                    <li title="Щипок или кулак — схватить, вращать, нажать сразу"><span className="help-ico"><Grab aria-hidden="true" /></span><span><b>Кулак</b> — схватить</span></li>
+                <ul className="help-strip" aria-label={tr('Управление руками')}>
+                    <li title={tr('Ведите ладонью — двигается курсор')}><span className="help-ico"><Hand aria-hidden="true" /></span><span><b>{tr('Ладонь')}</b> — {tr('курсор')}</span></li>
+                    <li title={tr('Задержите курсор на кнопке — она нажмётся')}><span className="help-ico"><Timer aria-hidden="true" /></span><span><b>{tr('Задержка')}</b> — {tr('нажать')}</span></li>
+                    <li title={tr('Щипок или кулак — схватить, вращать, нажать сразу')}><span className="help-ico"><Grab aria-hidden="true" /></span><span><b>{tr('Кулак')}</b> — {tr('схватить')}</span></li>
                 </ul>
             </div>
             <div className="module-grid">
@@ -152,4 +174,5 @@ export const Dashboard = ({ onOpen }) => (
             </div>
         </main>
     </div>
-);
+    );
+};

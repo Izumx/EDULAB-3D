@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PartyPopper, Target, X } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
+import { useTr } from '../../i18n/lang';
 import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
 import { CATEGORIES, ELEMENTS } from './elements';
@@ -195,6 +196,7 @@ function MoleculeCard({ mol, onClose }) {
 }
 
 export default function ChemistryLab({ onBack }) {
+    const tr = useTr();
     const [atoms, setAtoms] = useState([]);
     const [mol, setMol] = useState(null);
     const [formKey, setFormKey] = useState(0);
@@ -312,8 +314,8 @@ export default function ChemistryLab({ onBack }) {
 
     const modeSwitch = (
         <div className="chem-seg" role="group" aria-label="Режим">
-            <button className={`btn${mode === 'build' ? ' active' : ''}`} onClick={() => { setMode('build'); zoom.current = 1; }}>Конструктор</button>
-            <button className={`btn${mode === 'react' ? ' active' : ''}`} onClick={() => { setMode('react'); zoom.current = 1; }}>Реакции</button>
+            <button className={`btn${mode === 'build' ? ' active' : ''}`} onClick={() => { setMode('build'); zoom.current = 1; }}>{tr('Конструктор')}</button>
+            <button className={`btn${mode === 'react' ? ' active' : ''}`} onClick={() => { setMode('react'); zoom.current = 1; }}>{tr('Реакции')}</button>
         </div>
     );
 
@@ -323,7 +325,7 @@ export default function ChemistryLab({ onBack }) {
                 actions={(
                     <div className="chem-view">
                         {modeSwitch}
-                        <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>Подписи</button>
+                        <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>{tr('Подписи')}</button>
                     </div>
                 )}>
                 <ReactionMode labels={labels} zoom={zoom} />
@@ -334,8 +336,8 @@ export default function ChemistryLab({ onBack }) {
     const viewControls = (
         <div className="chem-view">
             {modeSwitch}
-            <button className={`btn${task ? ' active' : ''}`} onClick={nextTask}><Target /> Задание</button>
-            <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>Подписи</button>
+            <button className={`btn${task ? ' active' : ''}`} onClick={nextTask}><Target /> {tr('Задание')}</button>
+            <button className={`btn${labels ? ' active' : ''}`} aria-pressed={labels} onClick={() => setLabels(v => !v)}>{tr('Подписи')}</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(1.18)} aria-label="Отдалить">−</button>
             <button className="btn btn-icon chem-zoom" onClick={() => zoomBy(0.85)} aria-label="Приблизить">+</button>
         </div>

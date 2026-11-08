@@ -1,6 +1,7 @@
 // Geography lab: a globe with coordinates and a find-the-point game, and seasons with day length.
 import React, { useState } from 'react';
 import { LabShell } from '../../ui/LabShell';
+import { useTr } from '../../i18n/lang';
 import GlobeMode from './GlobeMode';
 import { initialLabMode, rememberLabMode } from '../../ui/labMode';
 import SeasonsMode from './SeasonsMode';
@@ -17,11 +18,12 @@ export default function GeoLab({ onBack }) {
         setModeState(m);
         rememberLabMode(m);
     };
+    const tr = useTr();
     const current = MODES.find(m => m.id === mode);
     const tabs = (
-        <div className="geo-seg" role="group" aria-label="Режим">
+        <div className="geo-seg" role="group" aria-label={tr('Режим')}>
             {MODES.map(m => (
-                <button key={m.id} className={`btn${mode === m.id ? ' active' : ''}`} onClick={() => setMode(m.id)}>{m.label}</button>
+                <button key={m.id} className={`btn${mode === m.id ? ' active' : ''}`} onClick={() => setMode(m.id)}>{tr(m.label)}</button>
             ))}
         </div>
     );
