@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Feather, Hand, Repeat, RotateCcw, Satellite, SlidersHorizontal, Snail, Wind } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
+import { useTr } from '../../i18n/lang';
 import { PhysicsStage } from './PhysicsScene';
 import { PRESETS, OBJECTS, BODY_INDEX, GALILEO_HEIGHT, EARTH_G } from './data';
 import { resetWorld, setParams, selectBody, startGalileo } from './engine';
@@ -194,6 +195,7 @@ function GalileoResult({ gal, g, rho, drag, onClose }) {
 }
 
 export default function PhysicsLab({ onBack }) {
+    const tr = useTr();
     const [presetId, setPresetId] = useState('earth');
     const [g, setG] = useState(9.8);
     const [rho, setRho] = useState(1.2);
@@ -248,9 +250,9 @@ export default function PhysicsLab({ onBack }) {
             actions={(
                 <>
                     <button className={`btn${slow ? ' active' : ''}`} onClick={() => setSlow((s) => !s)}>
-                        <Snail /> Замедление ×0,25
+                        <Snail /> {tr('Замедление ×0,25')}
                     </button>
-                    <button className="btn" onClick={reset}><RotateCcw /> Заново</button>
+                    <button className="btn" onClick={reset}><RotateCcw /> {tr('Заново')}</button>
                 </>
             )}
         >

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Emblem } from '../../ui/Emblem';
 import { LabShell } from '../../ui/LabShell';
+import { useTr } from '../../i18n/lang';
 import Confetti from './Confetti';
 import { TOPICS, MIXED } from './questions';
 import { LETTERS, TEAMS, TIMER_SECONDS, buildRound, resultTitle, topicById } from './quizLogic';
@@ -71,19 +72,21 @@ function TimerRing({ left }) {
 }
 
 function SetupScreen({ settings, onChange, onStart, locked }) {
+    const tr = useTr();
+    const onOff = v => tr(v ? 'вкл' : 'выкл');
     return (
         <div className="quiz-setup">
             <div className="quiz-hero">
                 <div className="quiz-hero-icon"><Emblem id="quiz" /></div>
                 <div>
-                    <h2>Научная викторина</h2>
-                    <p className="muted">Настройте игру и выберите тему — вопросы начнутся сразу</p>
+                    <h2>{tr('Научная викторина')}</h2>
+                    <p className="muted">{tr('Настройте игру и выберите тему — вопросы начнутся сразу')}</p>
                 </div>
             </div>
 
             <div className="quiz-options">
                 <div className="quiz-option-group">
-                    <span className="quiz-option-label">Вопросов:</span>
+                    <span className="quiz-option-label">{tr('Вопросов:')}</span>
                     {COUNTS.map(n => (
                         <button key={n} className={`btn quiz-count${settings.count === n ? ' active' : ''}`}
                             disabled={locked} onClick={() => onChange({ count: n })}>{n}</button>
@@ -91,11 +94,11 @@ function SetupScreen({ settings, onChange, onStart, locked }) {
                 </div>
                 <button className={`btn quiz-toggle${settings.timer ? ' active' : ''}`} disabled={locked}
                     onClick={() => onChange({ timer: !settings.timer })}>
-                    <Timer /> Таймер {TIMER_SECONDS} с: <b>{settings.timer ? 'вкл' : 'выкл'}</b>
+                    <Timer /> {tr('Таймер')} {TIMER_SECONDS} с: <b>{onOff(settings.timer)}</b>
                 </button>
                 <button className={`btn quiz-toggle${settings.teams ? ' active' : ''}`} disabled={locked}
                     onClick={() => onChange({ teams: !settings.teams })}>
-                    <Users /> Команды: <b>{settings.teams ? 'вкл' : 'выкл'}</b>
+                    <Users /> {tr('Команды')}: <b>{onOff(settings.teams)}</b>
                 </button>
             </div>
 
@@ -105,8 +108,8 @@ function SetupScreen({ settings, onChange, onStart, locked }) {
                         style={{ '--topic': t.color, animationDelay: `${i * 70}ms` }}
                         disabled={locked} onClick={() => onStart(t.id)}>
                         <span className="quiz-topic-icon"><TopicIcon id={t.id} /></span>
-                        <span className="quiz-topic-label">{t.label}</span>
-                        <span className="quiz-topic-hint">{t.hint}</span>
+                        <span className="quiz-topic-label">{tr(t.label)}</span>
+                        <span className="quiz-topic-hint">{tr(t.hint)}</span>
                     </button>
                 ))}
             </div>
@@ -256,6 +259,7 @@ function ResultsScreen({ results, total, teams, locked, onAgain, onSetup, onMenu
 }
 
 export default function QuizLab({ onBack }) {
+    const tr = useTr();
     const [settings, setSettings] = useState(loadSettings);
     const [phase, setPhase] = useState('setup'); // setup | play | results
     const [round, setRound] = useState({ topic: null, questions: [], teams: false, timer: false });
@@ -370,12 +374,12 @@ export default function QuizLab({ onBack }) {
                 </div>
             ) : (
                 <div className="quiz-score-pill solo">
-                    <span>Правильно</span>
+                    <span>{tr('Правильно')}</span>
                     <b key={correctCount} className="quiz-score-num">{correctCount}</b>
                     <span className="muted">из {results.length}</span>
                 </div>
             )}
-            <button className="btn btn-small btn-ghost" onClick={toSetup}><X /> Завершить</button>
+            <button className="btn btn-small btn-ghost" onClick={toSetup}><X /> {tr('Завершить')}</button>
         </>
     ) : null;
 

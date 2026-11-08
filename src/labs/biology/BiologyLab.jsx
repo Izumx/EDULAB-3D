@@ -2,6 +2,7 @@
 import React, { Suspense, lazy, useCallback, useRef, useState } from 'react';
 import { Hand, MousePointer2, X } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
+import { useTr } from '../../i18n/lang';
 import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
 import {
@@ -103,6 +104,7 @@ function IntroCard({ view, unzip, handPresent }) {
 }
 
 export default function BiologyLab({ onBack }) {
+    const tr = useTr();
     const [view, setView] = useState(() => initialLabMode('animal', VIEWS.map(v => v.id)));
     const [selected, setSelected] = useState(null);
     const [labels, setLabels] = useState(() => view !== 'plant');
@@ -159,7 +161,7 @@ export default function BiologyLab({ onBack }) {
     const tabs = (
         <div className="bio-seg" role="group" aria-label="Модель">
             {VIEWS.map(v => (
-                <button key={v.id} className={`btn${view === v.id ? ' active' : ''}`} onClick={() => changeView(v.id)}>{v.label}</button>
+                <button key={v.id} className={`btn${view === v.id ? ' active' : ''}`} onClick={() => changeView(v.id)}>{tr(v.label)}</button>
             ))}
         </div>
     );

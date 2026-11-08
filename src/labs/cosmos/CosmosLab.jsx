@@ -2,6 +2,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Lightbulb, Pause, Play } from 'lucide-react';
 import { LabShell } from '../../ui/LabShell';
+import { useTr } from '../../i18n/lang';
 import { LabCanvas } from '../../ui/three';
 import { useHandStatus } from '../../hand/handStore';
 import SolarScene from './SolarScene';
@@ -16,6 +17,7 @@ import './cosmos.css';
 const CAMERA = { position: [0, 30, 80], fov: 50, near: 0.05, far: 5000 };
 
 export default function CosmosLab({ onBack }) {
+    const tr = useTr();
     const [selectedId, setSelectedId] = useState(null);
     const [flyKey, setFlyKey] = useState(0);
     const [speedIdx, setSpeedIdx] = useState(2);
@@ -53,9 +55,9 @@ export default function CosmosLab({ onBack }) {
 
     const scaleToggle = (
         <div className="cosmos-seg" role="group" aria-label="Масштаб">
-            <button className={`btn${mode === 'visual' ? ' active' : ''}`} onClick={() => setMode('visual')}>Наглядный масштаб</button>
-            <button className={`btn${mode === 'real' ? ' active' : ''}`} onClick={() => setMode('real')}>Реальный масштаб</button>
-            <button className={`btn${mode === 'moon' ? ' active' : ''}`} onClick={() => setMode('moon')}>Фазы Луны</button>
+            <button className={`btn${mode === 'visual' ? ' active' : ''}`} onClick={() => setMode('visual')}>{tr('Наглядный масштаб')}</button>
+            <button className={`btn${mode === 'real' ? ' active' : ''}`} onClick={() => setMode('real')}>{tr('Реальный масштаб')}</button>
+            <button className={`btn${mode === 'moon' ? ' active' : ''}`} onClick={() => setMode('moon')}>{tr('Фазы Луны')}</button>
         </div>
     );
 

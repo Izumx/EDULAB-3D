@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, BotMessageSquare, Mic, SendHorizontal, Volume2, X } from 'lucide-react';
+import { useLang, trFor } from '../i18n/lang';
 import './AIChatbot.css';
 
 // Requests go through the Vite dev-server proxy (vite.config.js), which adds the xkiro key server-side
@@ -30,6 +31,20 @@ const QUICK_QUESTIONS = {
     quiz: ['Объясни последний ответ подробнее', 'Дай подсказку, не называя ответ', 'Придумай похожий вопрос'],
 };
 
+const QUICK_QUESTIONS_KK = {
+    menu: ['EduLab 3D не істей алады?', 'Қолмен қалай басқарамын?', 'Сыныпқа қызықты сұрақ ойлап тап'],
+    chemistry: ['Коваленттік байланыс дегеніміз не?', 'Неліктен су — полюсті молекула?', 'Иондық байланыс коваленттік байланыстан қалай ерекшеленеді?'],
+    biology: ['Жасушаға митохондрия не үшін керек?', 'Өсімдік жасушасы жануар жасушасынан қалай ерекшеленеді?', 'ДНҚ қалай құрылған?'],
+    physics: ['Неліктен қауырсын шардан баяу құлайды?', 'Еркін түсу үдеуі дегеніміз не?', 'Неліктен Айда бәрі жеңіл?'],
+    cosmos: ['Неліктен Шолпанда сонша ыстық?', 'Неліктен Айдың фазалары өзгереді?', 'Неліктен Плутон енді планета емес?'],
+    math: ['Көпжақтың жаймасы дегеніміз не?', 'Неліктен пирамиданың көлемі призмадан 3 есе аз?', 'Эйлер формуласы дегеніміз не?'],
+    geo: ['Ендік бойлықтан қалай ерекшеленеді?', 'Неліктен полярлық түн болады?', 'Неліктен жыл мезгілдері ауысады?'],
+    quiz: ['Соңғы жауапты толығырақ түсіндір', 'Жауапты айтпай, кеңес бер', 'Ұқсас сұрақ ойлап тап'],
+};
+
+const WELCOME = 'Привет! Я EduBot — помощник на уроке. Нажмите на готовый вопрос, скажите его голосом или напишите.';
+const SPEECH_LANG = { ru: 'ru-RU', kk: 'kk-KZ' };
+
 const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
 
 // Minimal safe formatting for model replies: **bold** and line breaks, nothing else is interpreted
@@ -43,21 +58,24 @@ function renderText(text) {
     ));
 }
 
-function speak(text) {
+function speak(text, lang) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text.replace(/\*\*/g, ''));
-    utterance.lang = 'ru-RU';
-    const voice = window.speechSynthesis.getVoices().find(v => v.lang.startsWith('ru'));
+    const voices = window.speechSynthesis.getVoices();
+    // not every computer has a Kazakh voice: then read with a Russian one
+    const voice = voices.find(v => v.lang.startsWith(lang)) || voices.find(v => v.lang.startsWith('ru'));
+    utterance.lang = voice?.lang || SPEECH_LANG[lang];
     if (voice) utterance.voice = voice;
     window.speechSynthesis.speak(utterance);
 }
 
 export const AIChatbot = ({ mode }) => {
+    const lang = useLang();
+    const tr = ru => trFor(lang, ru);
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([
-        { text: 'Привет! Я EduBot — помощник на уроке. Нажмите на готовый вопрос, скажите его голосом или напишите.', sender: 'bot' }
-    ]);
+    // the welcome line is translated when shown, so it follows a language switch
+    const [messages, setMessages] = useState([{ text: WELCOME, sender: 'bot', welcome: true }]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [listening, setListening] = useState(false);
@@ -93,8 +111,10 @@ export const AIChatbot = ({ mode }) => {
                         {
                             role: 'system',
                             content: `You are EduBot, a friendly science teaching assistant inside EduLab 3D, a 3D science app used in school lessons on a projector.
-The teacher is currently in the "${MODE_NAMES[mode] || mode}" section. The app has labs: Chemistry (build molecules, balance reactions), Biology (cell organelles, DNA, mitosis), Physics (gravity, free fall, air resistance), Cosmos (Solar System, Moon phases), Math (solids, nets, views of a figure), Geography (globe, coordinates, seasons and day length), and a class Quiz. Users control it with hand gestures through the webcam.
-Answer for school students (grades 7–10): accurate, short (2–5 sentences), clear, with a simple example when helpful. Answer in the same language the user writes in (usually Russian).`
+The teacher is currently in the "${MODE_NAMES[mode] || mode}" section. The interface language is ${lang === 'kk' ? 'Kazakh' : 'Russian'}. The app has labs: Chemistry (build molecules, balance reactions), Biology (cell organelles, DNA, mitosis), Physics (gravity, free fall, air resistance), Cosmos (Solar System, Moon phases), Math (solids, nets, views of a figure), Geography (globe, coordinates, seasons and day length), and a class Quiz. Users control it with hand gestures through the webcam.
+Answer for school students (grades 7–10): accurate, short (2–5 sentences), clear, with a simple example when helpful. ${lang === 'kk'
+                                ? 'Answer in Kazakh (қазақ тілі) with correct Kazakh scientific terms, unless the user writes in another language.'
+                                : 'Answer in the same language the user writes in (usually Russian).'}`
                         },
                         ...history.slice(-HISTORY_LIMIT).map(m => ({
                             role: m.sender === 'user' ? 'user' : 'assistant',
@@ -109,12 +129,12 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
                 throw new Error(data.error?.message || `HTTP ${response.status}`);
             }
 
-            const aiText = data.choices?.[0]?.message?.content?.trim() || 'Не получилось сформулировать ответ. Попробуйте спросить иначе.';
+            const aiText = data.choices?.[0]?.message?.content?.trim() || tr('Не получилось сформулировать ответ. Попробуйте спросить иначе.');
             setMessages(prev => [...prev, { text: aiText, sender: 'bot' }]);
-            if (readAloud) speak(aiText);
+            if (readAloud) speak(aiText, lang);
         } catch (error) {
             console.error('AI Error:', error);
-            setMessages(prev => [...prev, { text: 'Нет связи с ИИ. Проверьте интернет и попробуйте ещё раз.', sender: 'bot', error: true }]);
+            setMessages(prev => [...prev, { text: tr('Нет связи с ИИ. Проверьте интернет и попробуйте ещё раз.'), sender: 'bot', error: true }]);
         } finally {
             setIsLoading(false);
         }
@@ -126,7 +146,7 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
             return;
         }
         const recognition = new SpeechRecognition();
-        recognition.lang = 'ru-RU';
+        recognition.lang = SPEECH_LANG[lang];
         recognition.interimResults = true;
         let finalText = '';
         recognition.onresult = (e) => {
@@ -135,7 +155,7 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
         };
         recognition.onerror = (e) => {
             if (e.error === 'not-allowed') {
-                setMessages(prev => [...prev, { text: 'Нет доступа к микрофону. Разрешите его в адресной строке браузера.', sender: 'bot', error: true }]);
+                setMessages(prev => [...prev, { text: tr('Нет доступа к микрофону. Разрешите его в адресной строке браузера.'), sender: 'bot', error: true }]);
             }
         };
         recognition.onend = () => {
@@ -147,14 +167,15 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
         recognition.start();
     };
 
-    const quick = QUICK_QUESTIONS[mode] || QUICK_QUESTIONS.menu;
+    const questions = lang === 'kk' ? QUICK_QUESTIONS_KK : QUICK_QUESTIONS;
+    const quick = questions[mode] || questions.menu;
 
     return (
         <div className={`ai-chatbot ${isOpen ? 'open' : ''}`}>
             {!isOpen && (
-                <button className="ai-fab" onClick={() => setIsOpen(true)} aria-label="Открыть EduBot">
+                <button className="ai-fab" onClick={() => setIsOpen(true)} aria-label={tr('Открыть EduBot')}>
                     <BotMessageSquare className="ai-fab-icon" aria-hidden="true" />
-                    <span className="ai-fab-text">Спросить</span>
+                    <span className="ai-fab-text">{tr('Спросить')}</span>
                 </button>
             )}
 
@@ -164,18 +185,18 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
                         <div className="ai-avatar"><Bot aria-hidden="true" /></div>
                         <div className="ai-header-text">
                             <h3>EduBot</h3>
-                            <span>Раздел: {MODE_NAMES[mode] || mode}</span>
+                            <span>{tr('Раздел')}: {tr(MODE_NAMES[mode] || mode)}</span>
                         </div>
                         <button className={`btn btn-icon btn-small ${readAloud ? 'active' : ''}`}
                             onClick={() => { setReadAloud(r => !r); window.speechSynthesis?.cancel(); }}
-                            title="Читать ответы вслух" aria-label="Читать ответы вслух"><Volume2 /></button>
-                        <button className="btn btn-icon btn-small" onClick={() => setIsOpen(false)} aria-label="Закрыть"><X /></button>
+                            title={tr('Читать ответы вслух')} aria-label={tr('Читать ответы вслух')}><Volume2 /></button>
+                        <button className="btn btn-icon btn-small" onClick={() => setIsOpen(false)} aria-label={tr('Закрыть')}><X /></button>
                     </header>
 
                     <div className="ai-messages">
                         {messages.map((msg, i) => (
                             <div key={i} className={`message ${msg.sender} ${msg.error ? 'error' : ''}`}>
-                                <div className="bubble">{msg.sender === 'bot' ? renderText(msg.text) : msg.text}</div>
+                                <div className="bubble">{msg.sender === 'bot' ? renderText(msg.welcome ? tr(msg.text) : msg.text) : msg.text}</div>
                             </div>
                         ))}
                         {isLoading && (
@@ -195,16 +216,16 @@ Answer for school students (grades 7–10): accurate, short (2–5 sentences), c
                     <form className="ai-input-area" onSubmit={(e) => { e.preventDefault(); ask(input); }}>
                         {SpeechRecognition && (
                             <button type="button" className={`btn btn-icon ${listening ? 'listening' : ''}`} onClick={toggleListening}
-                                aria-label={listening ? 'Остановить запись' : 'Спросить голосом'} title="Спросить голосом"><Mic /></button>
+                                aria-label={tr(listening ? 'Остановить запись' : 'Спросить голосом')} title={tr('Спросить голосом')}><Mic /></button>
                         )}
                         <input
                             type="text"
-                            placeholder={listening ? 'Говорите…' : 'Ваш вопрос…'}
+                            placeholder={tr(listening ? 'Говорите…' : 'Ваш вопрос…')}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             disabled={isLoading}
                         />
-                        <button type="submit" className="btn btn-primary" disabled={isLoading || !input.trim()} aria-label="Отправить"><SendHorizontal /></button>
+                        <button type="submit" className="btn btn-primary" disabled={isLoading || !input.trim()} aria-label={tr('Отправить')}><SendHorizontal /></button>
                     </form>
                 </div>
             )}

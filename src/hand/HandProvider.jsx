@@ -8,6 +8,7 @@ import { LoaderCircle, TriangleAlert } from 'lucide-react';
 import { hand, onHand, useHandStatus, emitHand } from './handStore';
 import { startTracker, stopTracker, getVideoStream } from './tracker';
 import { useHandSettings, getHandSettings } from './settings';
+import { useTr } from '../i18n/lang';
 import './hand.css';
 
 const CLICKABLE = 'button:not(:disabled), a[href], [role="button"], [data-hand-click], input[type="range"]';
@@ -140,6 +141,7 @@ const BONES = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [
     [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [17, 18], [18, 19], [19, 20], [0, 17]];
 
 function CameraPreview() {
+    const tr = useTr();
     const { status, error, present } = useHandStatus();
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
@@ -180,14 +182,14 @@ function CameraPreview() {
                 </div>
             )}
             <div className="camera-preview-status">
-                {status === 'loading' && <><LoaderCircle className="ico ico-spin" aria-hidden="true" /> Запускаю камеру…</>}
+                {status === 'loading' && <><LoaderCircle className="ico ico-spin" aria-hidden="true" /> {tr('Запускаю камеру…')}</>}
                 {status === 'ready' && (present
-                    ? <><span className="dot ok" /> Рука найдена</>
-                    : <><span className="dot wait" /> Покажите ладонь камере</>)}
-                {status === 'error' && <><TriangleAlert className="ico" aria-hidden="true" /> {error}</>}
+                    ? <><span className="dot ok" /> {tr('Рука найдена')}</>
+                    : <><span className="dot wait" /> {tr('Покажите ладонь камере')}</>)}
+                {status === 'error' && <><TriangleAlert className="ico" aria-hidden="true" /> {tr(error)}</>}
             </div>
             {status === 'error' && (
-                <button className="btn btn-small" onClick={() => startTracker()}>Повторить</button>
+                <button className="btn btn-small" onClick={() => startTracker()}>{tr('Повторить')}</button>
             )}
         </div>
     );
